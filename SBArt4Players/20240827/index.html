@@ -1,8 +1,10 @@
 <!doctype html>
+<!-- (C) Tatsuo Unemi, 2024 -->
 <html lang="en-US">
 <head>
 <meta charset="utf-8"/>
-<title>SBArt4 Animation on WebGL</title>
+<title>SBArt4 Animation on WebGL 20240828</title>
+<script src="myScript.js" type="text/javascript"></script>
 <script id="vshader" type="x-shader/x-vertex">
 attribute vec4 vPos;
 uniform float xScale;
@@ -12,12 +14,1256 @@ void main(void) {
 	pCoord = vec2(vPos.x*xScale,vPos.y);
 }
 </script>
-<script src="myScript.js#1" type="text/javascript"></script>
+<script id="fs1" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec2 size;
+uniform float T;
+varying vec2 pCoord;
+vec3 cmp(vec3 a,vec3 b,vec3 c){
+	return vec3((a.x<0.)?b.x:c.x,(a.y<0.)?b.y:c.y,(a.z<0.)?b.z:c.z);}
+vec3 c2p(vec3 a){
+	return vec3(length(a),atan(a.y,a.x)/3.1415927,atan(a.z,length(a.xy))/3.1415927);}
+vec3 logA(vec3 a){return cmp(-a,log(a),vec3(0.));}
+vec3 myMin(vec3 a,vec3 b){return (a.x<b.x)?a:b;}
+vec3 cnst(float u,vec3 c){return c+c*vec3(u);}
+vec3 power(vec3 a, vec3 b){
+	return cmp(-a,cmp(-b,pow(a,b),cmp(-a,vec3(1.),vec3(0.))),vec3(0.));}
+vec3 divide(vec3 a, vec3 b){
+	return a/cmp(b,b,cmp(-b,b,vec3(1.)));}
+vec3 rotate(vec3 a,vec3 b){
+	b=(mod(b+1.,2.)-1.)*3.1415927;
+	vec3 s=sin(b),c=cos(b);
+	return vec3(dot(vec3(c.x*c.z+s.x*s.y*s.z,c.x*s.y*s.z-s.x*c.z,c.y*s.z),a),
+		dot(vec3(s.x*c.y,c.x*c.y,-s.y),a),
+		dot(vec3(c.x*s.z+s.x*s.y*c.z,c.y*c.z-s.x*s.z,c.y*c.z),a));}
+vec3 sqrtA(vec3 a){return cmp(a,-sqrt(-a),sqrt(a));}
+vec3 p2c(vec3 a){
+	return vec3(cos(a.z*3.1415927)*cos(a.y*3.1415927),
+		cos(a.z*3.1415927)*sin(a.y*3.1415927),sin(a.z*3.1415927))*a.x;}
+vec3 hypot(vec3 a,vec3 b){return sqrt(a*a+b*b);}
+vec3 myMax(vec3 a,vec3 b){return (a.x>b.x)?a:b;}
+vec3 fn(vec2 p,float t,float u){
+	p=p*vec2(0.840,0.767)+vec2(0.561,-0.247);
+	vec3 v=(c2p((abs(logA(abs(myMin(c2p((cnst(u,vec3(1.955562,1.736565,-0.119965)))-(power(abs(divide(rotate(rotate(sin((vec3(p.x,t,p.y))*3.1415927),vec3(p.x,p.y,t)),vec3(p.y,t,p.x)),(cnst(u,vec3(1.955562,1.736565,-0.119965)))-(myMin(divide((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(cnst(u,vec3(1.845742,1.710555,0.780517)))),sin((vec3(t,p.x,p.y))*3.1415927)),p2c(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.x,t,p.y))))/2.)),exp(rotate(-(cnst(u,vec3(-0.073542,-1.735372,1.927805))),cnst(u,vec3(1.883485,-0.669459,1.862767))))),logA(abs(rotate(c2p(exp(vec3(p.x,t,p.y))),cnst(u,vec3(-1.709003,1.218676,-0.887567))))))))))))),abs(p2c(vec3(p.y,t,p.x)))))),p2c(-(divide(logA(abs(hypot(myMax(cos((vec3(p.x,p.y,t))*3.1415927),(abs(logA(abs(sin((hypot((vec3(p.y,t,p.x))-(myMin(divide(abs(sqrtA(sin((hypot(cnst(u,vec3(1.845742,1.710555,0.780517)),c2p(cnst(u,vec3(-1.467095,0.882165,-1.054229)))))*3.1415927))),sin((vec3(p.y,p.x,t))*3.1415927)),vec3(p.x,t,p.y))),sin((vec3(p.x,p.y,t))*3.1415927)))*3.1415927)))))*(rotate(logA(abs(vec3(p.y,p.x,t))),(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.y,t,p.x))))/2.)),logA(abs(rotate(c2p(exp(cnst(u,vec3(-0.929638,-1.584967,0.847705)))),cnst(u,vec3(1.950307,0.065199,0.799913)))))),logA(abs(rotate(c2p(exp(vec3(p.y,t,p.x))),cnst(u,vec3(1.950307,0.065199,0.799913)))))))))+(hypot(abs((vec3(p.x,p.y,t))+(vec3(p.y,p.x,t))),vec3(t,p.x,p.y)))))),cnst(u,vec3(0.817616,0.758660,-1.700391))))),cnst(u,vec3(0.876495,0.383847,-0.397954))))))))))*(rotate(vec3(p.y,p.x,t),(abs(power(abs((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(sin(((vec3(t,p.x,p.y))-(cnst(u,vec3(-0.976102,1.916044,-1.123562))))*3.1415927)))),abs(exp(sqrtA(p2c(vec3(p.y,t,p.x))))))))+((abs(cnst(u,vec3(0.613423,-0.727868,1.108056))))-(cnst(u,vec3(-1.467095,0.882165,-1.054229))))))))*vec3(0.423,0.569,0.183);
+	v=cmp(v-vec3(16.),cmp(v+vec3(16.),vec3(0.),v),vec3(0.));
+	float h=v.z*6.2831853;
+	float x=v.y*cos(h)/3.,y=v.y*sin(h)/1.73205080757;
+	v=mod(abs(vec3(v.x+x+y,v.x-x-x,v.x+x-y))/2.,2.);
+	v=cmp(v-1.,v,2.-v);v=cmp(v,vec3(0.),pow(v,vec3(0.9755)));
+	float gr=(v.x+v.y+v.z)/3.,gm=1.3507;
+	v=cmp(v-vec3(gr),pow(v/gr,vec3(gm))*gr,1.-pow((vec3(1.)-v)/(1.-gr),vec3(gm))*(1.-gr));
+	vec3 p1=cmp(v-vec3(v.g,v.b,v.r),vec3(0.),vec3(4.,2.,1.));x=p1.x+p1.y+p1.z;
+	vec3 p2=(x==6.)?vec3(v.g-v.b,v.b,v.r):(x==2.)?vec3(v.g-v.r,v.b,v.g):
+		(x==3.)?vec3(v.b-v.r,v.r,v.g):(x==1.)?vec3(v.b-v.g,v.r,v.b):
+		(x==5.)?vec3(v.r-v.g,v.g,v.b):vec3(v.r-v.b,v.g,v.r);
+	p2.x=p2.x/(p2.z-p2.y);
+	h=mod((x==6.)?mix(0.471,0.765,p2.x):(x==2.)?mix(0.765,0.727,p2.x):(x==3.)?mix(0.727,0.214,p2.x):
+		(x==1.)?mix(0.214,0.731,p2.x):(x==5.)?mix(0.731,0.031,p2.x):mix(0.031,0.471,p2.x),1.);
+	h=((h<0.083378)?0.:(h<0.455900)?h*0.894801-0.074607:(h<0.794424)?h*0.984669-0.115578:
+		(h<0.849833)?h*1.503976-0.528128:h*0.554936+0.278397)*6.;
+	x=mod(h,1.);p1=vec3(p2.y,p2.z-x*(p2.z-p2.y),p2.z-(1.-x)*(p2.z-p2.y));
+	v=(p2.z==p2.y)?vec3(p2.z):
+		(h<1.)?vec3(p2.z,p1.z,p1.x):(h<2.)?vec3(p1.y,p2.z,p1.x):
+		(h<3.)?vec3(p1.x,p2.z,p1.z):(h<4.)?vec3(p1.x,p1.y,p2.z):
+		(h<5.)?vec3(p1.z,p1.x,p2.z):vec3(p2.z,p1.x,p1.y);
+	return v;
+}
+void main(void){
+	float th=T*6.2831853;
+	float t=sin(th)*0.438444+-0.405553;
+	float u=(1.-cos(th))/2.*0.438444+-0.405553;
+	vec2 p=((size.x>size.y)?vec2(pCoord.x*size.x/size.y,pCoord.y):vec2(pCoord.x,pCoord.y*size.y/size.x));
+	gl_FragColor=vec4(fn(p,t,u),1.);
+}
+</script>
+<script id="fs2" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec2 size;
+uniform float T;
+varying vec2 pCoord;
+vec3 cmp(vec3 a,vec3 b,vec3 c){
+	return vec3((a.x<0.)?b.x:c.x,(a.y<0.)?b.y:c.y,(a.z<0.)?b.z:c.z);}
+vec3 c2p(vec3 a){
+	return vec3(length(a),atan(a.y,a.x)/3.1415927,atan(a.z,length(a.xy))/3.1415927);}
+vec3 logA(vec3 a){return cmp(-a,log(a),vec3(0.));}
+vec3 myMin(vec3 a,vec3 b){return (a.x<b.x)?a:b;}
+vec3 cnst(float u,vec3 c){return c+c*vec3(u);}
+vec3 power(vec3 a, vec3 b){
+	return cmp(-a,cmp(-b,pow(a,b),cmp(-a,vec3(1.),vec3(0.))),vec3(0.));}
+vec3 divide(vec3 a, vec3 b){
+	return a/cmp(b,b,cmp(-b,b,vec3(1.)));}
+vec3 rotate(vec3 a,vec3 b){
+	b=(mod(b+1.,2.)-1.)*3.1415927;
+	vec3 s=sin(b),c=cos(b);
+	return vec3(dot(vec3(c.x*c.z+s.x*s.y*s.z,c.x*s.y*s.z-s.x*c.z,c.y*s.z),a),
+		dot(vec3(s.x*c.y,c.x*c.y,-s.y),a),
+		dot(vec3(c.x*s.z+s.x*s.y*c.z,c.y*c.z-s.x*s.z,c.y*c.z),a));}
+vec3 hypot(vec3 a,vec3 b){return sqrt(a*a+b*b);}
+vec3 p2c(vec3 a){
+	return vec3(cos(a.z*3.1415927)*cos(a.y*3.1415927),
+		cos(a.z*3.1415927)*sin(a.y*3.1415927),sin(a.z*3.1415927))*a.x;}
+vec3 sqrtA(vec3 a){return cmp(a,-sqrt(-a),sqrt(a));}
+vec3 myMax(vec3 a,vec3 b){return (a.x>b.x)?a:b;}
+vec3 fn(vec2 p,float t,float u){
+	p=p*vec2(0.676,1.077)+vec2(0.643,-0.100);
+	vec3 v=(c2p((abs(logA(abs(myMin(c2p((cnst(u,vec3(1.955562,1.736565,-0.119965)))-(power(abs(divide(rotate(rotate(hypot(vec3(p.x,t,p.y),myMin(abs(vec3(p.y,t,p.x)),power(abs(p2c(abs(vec3(p.y,p.x,t)))),abs(cnst(u,vec3(1.643181,0.751665,-1.122219)))))),vec3(p.x,p.y,t)),vec3(p.y,t,p.x)),(cnst(u,vec3(1.955562,1.736565,-0.119965)))-(myMin(divide((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(p2c(cnst(u,vec3(1.845742,1.710555,0.780517))))),sin((vec3(t,p.x,p.y))*3.1415927)),p2c(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.x,t,p.y))))/2.)),exp(rotate(-(cnst(u,vec3(-0.073542,-1.735372,1.927805))),cnst(u,vec3(1.883485,-0.669459,1.862767))))),logA(abs(rotate(c2p(exp(vec3(p.x,t,p.y))),cnst(u,vec3(-1.709003,1.218676,-0.887567))))))))))))),abs(p2c(vec3(p.y,t,p.x)))))),p2c(-(divide(logA(abs(hypot(myMax(cos((vec3(p.x,p.y,t))*3.1415927),(abs(logA(abs(sin((hypot((vec3(p.y,t,p.x))-(myMin(divide((vec3(t,p.y,p.x))*(sqrtA(sin((hypot(cnst(u,vec3(1.845742,1.710555,0.780517)),c2p(cnst(u,vec3(-1.467095,0.882165,-1.054229)))))*3.1415927))),sin((vec3(p.y,p.x,t))*3.1415927)),vec3(p.x,t,p.y))),sin((vec3(p.x,p.y,t))*3.1415927)))*3.1415927)))))*(rotate(logA(abs(vec3(p.y,p.x,t))),(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.y,t,p.x))))/2.)),logA(abs(rotate(c2p(exp(cnst(u,vec3(-0.929638,-1.584967,0.847705)))),cnst(u,vec3(1.950307,0.065199,0.799913)))))),logA(abs(rotate(c2p(exp(vec3(p.y,t,p.x))),cnst(u,vec3(1.950307,0.065199,0.799913)))))))))+(hypot(abs((vec3(p.x,p.y,t))+(vec3(p.y,p.x,t))),vec3(t,p.x,p.y)))))),cnst(u,vec3(0.817616,0.758660,-1.700391))))),cnst(u,vec3(0.876495,0.383847,-0.397954))))))))))*(rotate(vec3(p.y,p.x,t),(abs(power(abs((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(sin(((vec3(t,p.x,p.y))-(cnst(u,vec3(-0.976102,1.916044,-1.123562))))*3.1415927)))),abs(exp(sqrtA(p2c(vec3(p.y,t,p.x))))))))+((abs(cnst(u,vec3(0.613423,-0.727868,1.108056))))-(cnst(u,vec3(-1.467095,0.882165,-1.054229))))))))*vec3(0.614,1.366,0.174);
+	v=cmp(v-vec3(16.),cmp(v+vec3(16.),vec3(0.),v),vec3(0.));
+	float h=v.z*6.2831853;
+	float x=v.y*cos(h)/3.,y=v.y*sin(h)/1.73205080757;
+	v=mod(abs(vec3(v.x+x+y,v.x-x-x,v.x+x-y))/2.,2.);
+	v=cmp(v-1.,v,2.-v);v=cmp(v,vec3(0.),pow(v,vec3(1.2516)));
+	float gr=(v.x+v.y+v.z)/3.,gm=0.9387;
+	v=cmp(v-vec3(gr),pow(v/gr,vec3(gm))*gr,1.-pow((vec3(1.)-v)/(1.-gr),vec3(gm))*(1.-gr));
+	vec3 p1=cmp(v-vec3(v.g,v.b,v.r),vec3(0.),vec3(4.,2.,1.));x=p1.x+p1.y+p1.z;
+	vec3 p2=(x==6.)?vec3(v.g-v.b,v.b,v.r):(x==2.)?vec3(v.g-v.r,v.b,v.g):
+		(x==3.)?vec3(v.b-v.r,v.r,v.g):(x==1.)?vec3(v.b-v.g,v.r,v.b):
+		(x==5.)?vec3(v.r-v.g,v.g,v.b):vec3(v.r-v.b,v.g,v.r);
+	p2.x=p2.x/(p2.z-p2.y);
+	h=mod((x==6.)?mix(0.130,0.682,p2.x):(x==2.)?mix(0.682,0.200,p2.x):(x==3.)?mix(0.200,0.922,p2.x):
+		(x==1.)?mix(0.922,0.213,p2.x):(x==5.)?mix(0.213,0.891,p2.x):mix(0.891,0.130,p2.x),1.);
+	h=((h<0.083378)?0.:(h<0.455900)?h*0.894801-0.074607:(h<0.794424)?h*0.984669-0.115578:
+		(h<0.849833)?h*1.503976-0.528128:h*0.554936+0.278397)*6.;
+	x=mod(h,1.);p1=vec3(p2.y,p2.z-x*(p2.z-p2.y),p2.z-(1.-x)*(p2.z-p2.y));
+	v=(p2.z==p2.y)?vec3(p2.z):
+		(h<1.)?vec3(p2.z,p1.z,p1.x):(h<2.)?vec3(p1.y,p2.z,p1.x):
+		(h<3.)?vec3(p1.x,p2.z,p1.z):(h<4.)?vec3(p1.x,p1.y,p2.z):
+		(h<5.)?vec3(p1.z,p1.x,p2.z):vec3(p2.z,p1.x,p1.y);
+	return v;
+}
+void main(void){
+	float th=T*6.2831853;
+	float t=sin(th)*1.014006+-0.244926;
+	float u=(1.-cos(th))/2.*1.014006+-0.244926;
+	vec2 p=((size.x>size.y)?vec2(pCoord.x*size.x/size.y,pCoord.y):vec2(pCoord.x,pCoord.y*size.y/size.x));
+	gl_FragColor=vec4(fn(p,t,u),1.);
+}
+</script>
+<script id="fs3" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec2 size;
+uniform float T;
+varying vec2 pCoord;
+vec3 cmp(vec3 a,vec3 b,vec3 c){
+	return vec3((a.x<0.)?b.x:c.x,(a.y<0.)?b.y:c.y,(a.z<0.)?b.z:c.z);}
+vec3 c2p(vec3 a){
+	return vec3(length(a),atan(a.y,a.x)/3.1415927,atan(a.z,length(a.xy))/3.1415927);}
+vec3 logA(vec3 a){return cmp(-a,log(a),vec3(0.));}
+vec3 myMin(vec3 a,vec3 b){return (a.x<b.x)?a:b;}
+vec3 cnst(float u,vec3 c){return c+c*vec3(u);}
+vec3 power(vec3 a, vec3 b){
+	return cmp(-a,cmp(-b,pow(a,b),cmp(-a,vec3(1.),vec3(0.))),vec3(0.));}
+vec3 divide(vec3 a, vec3 b){
+	return a/cmp(b,b,cmp(-b,b,vec3(1.)));}
+vec3 rotate(vec3 a,vec3 b){
+	b=(mod(b+1.,2.)-1.)*3.1415927;
+	vec3 s=sin(b),c=cos(b);
+	return vec3(dot(vec3(c.x*c.z+s.x*s.y*s.z,c.x*s.y*s.z-s.x*c.z,c.y*s.z),a),
+		dot(vec3(s.x*c.y,c.x*c.y,-s.y),a),
+		dot(vec3(c.x*s.z+s.x*s.y*c.z,c.y*c.z-s.x*s.z,c.y*c.z),a));}
+vec3 hypot(vec3 a,vec3 b){return sqrt(a*a+b*b);}
+vec3 p2c(vec3 a){
+	return vec3(cos(a.z*3.1415927)*cos(a.y*3.1415927),
+		cos(a.z*3.1415927)*sin(a.y*3.1415927),sin(a.z*3.1415927))*a.x;}
+vec3 sqrtA(vec3 a){return cmp(a,-sqrt(-a),sqrt(a));}
+vec3 myMax(vec3 a,vec3 b){return (a.x>b.x)?a:b;}
+vec3 fn(vec2 p,float t,float u){
+	p=p*vec2(0.524,0.611)+vec2(0.255,-0.348);
+	vec3 v=(c2p((abs(logA(abs(myMin(c2p((cnst(u,vec3(1.955562,1.736565,-0.119965)))-(power(abs(divide(rotate(rotate(hypot(vec3(p.x,t,p.y),myMin(abs(vec3(p.y,t,p.x)),power(abs(p2c(abs(vec3(p.y,p.x,t)))),abs(cnst(u,vec3(1.643181,0.751665,-1.122219)))))),vec3(p.x,p.y,t)),vec3(p.y,t,p.x)),(cnst(u,vec3(1.955562,1.736565,-0.119965)))-(myMin(divide((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(cnst(u,vec3(1.845742,1.710555,0.780517)))),sin((vec3(t,p.x,p.y))*3.1415927)),p2c(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.x,t,p.y))))/2.)),exp(rotate(-(cnst(u,vec3(-0.073542,-1.735372,1.927805))),cnst(u,vec3(1.883485,-0.669459,1.862767))))),logA(abs(rotate(c2p(exp(vec3(p.x,t,p.y))),cnst(u,vec3(-1.709003,1.218676,-0.887567))))))))))))),abs(p2c(vec3(p.y,t,p.x)))))),p2c(-(divide(logA(abs(hypot(myMax(cos((vec3(p.x,p.y,t))*3.1415927),(abs(logA(abs(sin((hypot((vec3(p.y,t,p.x))-(myMin(divide(abs(sqrtA(sin((hypot(cnst(u,vec3(1.845742,1.710555,0.780517)),c2p(cnst(u,vec3(-1.467095,0.882165,-1.054229)))))*3.1415927))),sin((vec3(p.y,p.x,t))*3.1415927)),vec3(p.x,t,p.y))),sin((vec3(p.x,p.y,t))*3.1415927)))*3.1415927)))))*(rotate(logA(abs(vec3(p.y,p.x,t))),(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.y,t,p.x))))/2.)),logA(abs(rotate(c2p(exp(cnst(u,vec3(-0.929638,-1.584967,0.847705)))),cnst(u,vec3(1.950307,0.065199,0.799913)))))),logA(abs(rotate(c2p(exp(vec3(p.y,t,p.x))),cnst(u,vec3(1.950307,0.065199,0.799913)))))))))+(hypot(abs((vec3(p.x,p.y,t))+(vec3(p.y,p.x,t))),vec3(t,p.x,p.y)))))),cnst(u,vec3(0.817616,0.758660,-1.700391))))),cnst(u,vec3(0.876495,0.383847,-0.397954))))))))))*(rotate(vec3(p.y,p.x,t),(abs(power(abs((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(sin(((vec3(t,p.x,p.y))-(cnst(u,vec3(-0.976102,1.916044,-1.123562))))*3.1415927)))),abs(exp(sqrtA(p2c(vec3(p.y,t,p.x))))))))+((abs(cnst(u,vec3(0.613423,-0.727868,1.108056))))-(((cnst(u,vec3(0.982048,0.861648,-0.435420)))+(cnst(u,vec3(-1.467095,0.882165,-1.054229))))/2.))))))*vec3(0.645,0.593,0.225);
+	v=cmp(v-vec3(16.),cmp(v+vec3(16.),vec3(0.),v),vec3(0.));
+	float h=v.z*6.2831853;
+	float x=v.y*cos(h)/3.,y=v.y*sin(h)/1.73205080757;
+	v=mod(abs(vec3(v.x+x+y,v.x-x-x,v.x+x-y))/2.,2.);
+	v=cmp(v-1.,v,2.-v);v=cmp(v,vec3(0.),pow(v,vec3(1.3909)));
+	float gr=(v.x+v.y+v.z)/3.,gm=0.6093;
+	v=cmp(v-vec3(gr),pow(v/gr,vec3(gm))*gr,1.-pow((vec3(1.)-v)/(1.-gr),vec3(gm))*(1.-gr));
+	vec3 p1=cmp(v-vec3(v.g,v.b,v.r),vec3(0.),vec3(4.,2.,1.));x=p1.x+p1.y+p1.z;
+	vec3 p2=(x==6.)?vec3(v.g-v.b,v.b,v.r):(x==2.)?vec3(v.g-v.r,v.b,v.g):
+		(x==3.)?vec3(v.b-v.r,v.r,v.g):(x==1.)?vec3(v.b-v.g,v.r,v.b):
+		(x==5.)?vec3(v.r-v.g,v.g,v.b):vec3(v.r-v.b,v.g,v.r);
+	p2.x=p2.x/(p2.z-p2.y);
+	h=mod((x==6.)?mix(0.978,0.068,p2.x):(x==2.)?mix(0.068,0.939,p2.x):(x==3.)?mix(0.939,0.258,p2.x):
+		(x==1.)?mix(0.258,0.346,p2.x):(x==5.)?mix(0.346,0.287,p2.x):mix(0.287,0.978,p2.x),1.);
+	h=((h<0.083378)?0.:(h<0.455900)?h*0.894801-0.074607:(h<0.794424)?h*0.984669-0.115578:
+		(h<0.849833)?h*1.503976-0.528128:h*0.554936+0.278397)*6.;
+	x=mod(h,1.);p1=vec3(p2.y,p2.z-x*(p2.z-p2.y),p2.z-(1.-x)*(p2.z-p2.y));
+	v=(p2.z==p2.y)?vec3(p2.z):
+		(h<1.)?vec3(p2.z,p1.z,p1.x):(h<2.)?vec3(p1.y,p2.z,p1.x):
+		(h<3.)?vec3(p1.x,p2.z,p1.z):(h<4.)?vec3(p1.x,p1.y,p2.z):
+		(h<5.)?vec3(p1.z,p1.x,p2.z):vec3(p2.z,p1.x,p1.y);
+	return v;
+}
+void main(void){
+	float th=T*6.2831853;
+	float t=sin(th)*0.317410+-0.456157;
+	float u=(1.-cos(th))/2.*0.317410+-0.456157;
+	vec2 p=((size.x>size.y)?vec2(pCoord.x*size.x/size.y,pCoord.y):vec2(pCoord.x,pCoord.y*size.y/size.x));
+	gl_FragColor=vec4(fn(p,t,u),1.);
+}
+</script>
+<script id="fs4" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec2 size;
+uniform float T;
+varying vec2 pCoord;
+vec3 cmp(vec3 a,vec3 b,vec3 c){
+	return vec3((a.x<0.)?b.x:c.x,(a.y<0.)?b.y:c.y,(a.z<0.)?b.z:c.z);}
+vec3 c2p(vec3 a){
+	return vec3(length(a),atan(a.y,a.x)/3.1415927,atan(a.z,length(a.xy))/3.1415927);}
+vec3 logA(vec3 a){return cmp(-a,log(a),vec3(0.));}
+vec3 myMin(vec3 a,vec3 b){return (a.x<b.x)?a:b;}
+vec3 cnst(float u,vec3 c){return c+c*vec3(u);}
+vec3 power(vec3 a, vec3 b){
+	return cmp(-a,cmp(-b,pow(a,b),cmp(-a,vec3(1.),vec3(0.))),vec3(0.));}
+vec3 divide(vec3 a, vec3 b){
+	return a/cmp(b,b,cmp(-b,b,vec3(1.)));}
+vec3 rotate(vec3 a,vec3 b){
+	b=(mod(b+1.,2.)-1.)*3.1415927;
+	vec3 s=sin(b),c=cos(b);
+	return vec3(dot(vec3(c.x*c.z+s.x*s.y*s.z,c.x*s.y*s.z-s.x*c.z,c.y*s.z),a),
+		dot(vec3(s.x*c.y,c.x*c.y,-s.y),a),
+		dot(vec3(c.x*s.z+s.x*s.y*c.z,c.y*c.z-s.x*s.z,c.y*c.z),a));}
+vec3 hypot(vec3 a,vec3 b){return sqrt(a*a+b*b);}
+vec3 p2c(vec3 a){
+	return vec3(cos(a.z*3.1415927)*cos(a.y*3.1415927),
+		cos(a.z*3.1415927)*sin(a.y*3.1415927),sin(a.z*3.1415927))*a.x;}
+vec3 sqrtA(vec3 a){return cmp(a,-sqrt(-a),sqrt(a));}
+vec3 myMax(vec3 a,vec3 b){return (a.x>b.x)?a:b;}
+vec3 fn(vec2 p,float t,float u){
+	p=p*vec2(1.112,1.499)+vec2(1.105,0.211);
+	vec3 v=(c2p((abs(logA(abs(myMin(c2p((cnst(u,vec3(1.955562,1.736565,-0.119965)))-(power(abs(divide(rotate(rotate(hypot(vec3(p.x,t,p.y),myMin(abs(vec3(p.y,t,p.x)),power(abs(p2c(abs(vec3(p.y,p.x,t)))),abs(cnst(u,vec3(1.643181,0.751665,-1.122219)))))),vec3(p.x,p.y,t)),vec3(p.y,t,p.x)),(cnst(u,vec3(1.955562,1.736565,-0.119965)))-(myMin(divide((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(cnst(u,vec3(1.845742,1.710555,0.780517)))),sin((vec3(t,p.x,p.y))*3.1415927)),p2c(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.x,t,p.y))))/2.)),exp(rotate(-(cnst(u,vec3(-0.073542,-1.735372,1.927805))),cnst(u,vec3(1.883485,-0.669459,1.862767))))),logA(abs(rotate(c2p(exp(vec3(p.x,t,p.y))),cnst(u,vec3(-1.709003,1.218676,-0.887567))))))))))))),abs(p2c(vec3(p.y,t,p.x)))))),p2c(-(divide(logA(abs(hypot(myMax(cos((vec3(p.x,p.y,t))*3.1415927),(abs(logA(abs(sin((hypot((vec3(p.y,t,p.x))-(myMin(divide(abs(sqrtA(sin((hypot(cnst(u,vec3(1.845742,1.710555,0.780517)),c2p(cnst(u,vec3(-1.467095,0.882165,-1.054229)))))*3.1415927))),sin((vec3(p.y,p.x,t))*3.1415927)),vec3(p.x,t,p.y))),sin((vec3(p.x,p.y,t))*3.1415927)))*3.1415927)))))*(rotate(logA(abs(vec3(p.y,p.x,t))),(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.y,t,p.x))))/2.)),logA(abs(rotate(c2p(exp(cnst(u,vec3(-0.929638,-1.584967,0.847705)))),cnst(u,vec3(1.950307,0.065199,0.799913)))))),logA(abs(rotate(c2p(exp(vec3(p.y,t,p.x))),cnst(u,vec3(1.950307,0.065199,0.799913)))))))))+(hypot(abs((vec3(p.x,p.y,t))+(vec3(p.y,p.x,t))),vec3(t,p.x,p.y)))))),cnst(u,vec3(0.817616,0.758660,-1.700391))))),cnst(u,vec3(0.876495,0.383847,-0.397954))))))))))*(rotate(vec3(p.y,p.x,t),(abs(power(abs((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(sin(((vec3(t,p.x,p.y))-(cnst(u,vec3(-0.976102,1.916044,-1.123562))))*3.1415927)))),abs(exp(sqrtA(p2c(vec3(p.y,t,p.x))))))))+((abs(cnst(u,vec3(0.613423,-0.727868,1.108056))))-(vec3(t,p.x,p.y)))))))*vec3(0.203,0.528,0.249);
+	v=cmp(v-vec3(16.),cmp(v+vec3(16.),vec3(0.),v),vec3(0.));
+	float h=v.z*6.2831853;
+	float x=v.y*cos(h)/3.,y=v.y*sin(h)/1.73205080757;
+	v=mod(abs(vec3(v.x+x+y,v.x-x-x,v.x+x-y))/2.,2.);
+	v=cmp(v-1.,v,2.-v);v=cmp(v,vec3(0.),pow(v,vec3(1.1965)));
+	float gr=(v.x+v.y+v.z)/3.,gm=1.5008;
+	v=cmp(v-vec3(gr),pow(v/gr,vec3(gm))*gr,1.-pow((vec3(1.)-v)/(1.-gr),vec3(gm))*(1.-gr));
+	vec3 p1=cmp(v-vec3(v.g,v.b,v.r),vec3(0.),vec3(4.,2.,1.));x=p1.x+p1.y+p1.z;
+	vec3 p2=(x==6.)?vec3(v.g-v.b,v.b,v.r):(x==2.)?vec3(v.g-v.r,v.b,v.g):
+		(x==3.)?vec3(v.b-v.r,v.r,v.g):(x==1.)?vec3(v.b-v.g,v.r,v.b):
+		(x==5.)?vec3(v.r-v.g,v.g,v.b):vec3(v.r-v.b,v.g,v.r);
+	p2.x=p2.x/(p2.z-p2.y);
+	h=mod((x==6.)?mix(0.632,0.550,p2.x):(x==2.)?mix(0.550,0.923,p2.x):(x==3.)?mix(0.923,0.273,p2.x):
+		(x==1.)?mix(0.273,0.725,p2.x):(x==5.)?mix(0.725,0.997,p2.x):mix(0.997,0.632,p2.x),1.);
+	h=((h<0.083378)?0.:(h<0.455900)?h*0.894801-0.074607:(h<0.794424)?h*0.984669-0.115578:
+		(h<0.849833)?h*1.503976-0.528128:h*0.554936+0.278397)*6.;
+	x=mod(h,1.);p1=vec3(p2.y,p2.z-x*(p2.z-p2.y),p2.z-(1.-x)*(p2.z-p2.y));
+	v=(p2.z==p2.y)?vec3(p2.z):
+		(h<1.)?vec3(p2.z,p1.z,p1.x):(h<2.)?vec3(p1.y,p2.z,p1.x):
+		(h<3.)?vec3(p1.x,p2.z,p1.z):(h<4.)?vec3(p1.x,p1.y,p2.z):
+		(h<5.)?vec3(p1.z,p1.x,p2.z):vec3(p2.z,p1.x,p1.y);
+	return v;
+}
+void main(void){
+	float th=T*6.2831853;
+	float t=sin(th)*0.508273+-0.466258;
+	float u=(1.-cos(th))/2.*0.508273+-0.466258;
+	vec2 p=((size.x>size.y)?vec2(pCoord.x*size.x/size.y,pCoord.y):vec2(pCoord.x,pCoord.y*size.y/size.x));
+	gl_FragColor=vec4(fn(p,t,u),1.);
+}
+</script>
+<script id="fs5" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec2 size;
+uniform float T;
+varying vec2 pCoord;
+vec3 cmp(vec3 a,vec3 b,vec3 c){
+	return vec3((a.x<0.)?b.x:c.x,(a.y<0.)?b.y:c.y,(a.z<0.)?b.z:c.z);}
+vec3 c2p(vec3 a){
+	return vec3(length(a),atan(a.y,a.x)/3.1415927,atan(a.z,length(a.xy))/3.1415927);}
+vec3 logA(vec3 a){return cmp(-a,log(a),vec3(0.));}
+vec3 myMin(vec3 a,vec3 b){return (a.x<b.x)?a:b;}
+vec3 cnst(float u,vec3 c){return c+c*vec3(u);}
+vec3 power(vec3 a, vec3 b){
+	return cmp(-a,cmp(-b,pow(a,b),cmp(-a,vec3(1.),vec3(0.))),vec3(0.));}
+vec3 divide(vec3 a, vec3 b){
+	return a/cmp(b,b,cmp(-b,b,vec3(1.)));}
+vec3 rotate(vec3 a,vec3 b){
+	b=(mod(b+1.,2.)-1.)*3.1415927;
+	vec3 s=sin(b),c=cos(b);
+	return vec3(dot(vec3(c.x*c.z+s.x*s.y*s.z,c.x*s.y*s.z-s.x*c.z,c.y*s.z),a),
+		dot(vec3(s.x*c.y,c.x*c.y,-s.y),a),
+		dot(vec3(c.x*s.z+s.x*s.y*c.z,c.y*c.z-s.x*s.z,c.y*c.z),a));}
+vec3 hypot(vec3 a,vec3 b){return sqrt(a*a+b*b);}
+vec3 p2c(vec3 a){
+	return vec3(cos(a.z*3.1415927)*cos(a.y*3.1415927),
+		cos(a.z*3.1415927)*sin(a.y*3.1415927),sin(a.z*3.1415927))*a.x;}
+vec3 sqrtA(vec3 a){return cmp(a,-sqrt(-a),sqrt(a));}
+vec3 myMax(vec3 a,vec3 b){return (a.x>b.x)?a:b;}
+vec3 fn(vec2 p,float t,float u){
+	p=p*vec2(0.733,0.698)+vec2(0.680,-0.315);
+	vec3 v=(c2p((abs(logA(abs(myMin(c2p((cnst(u,vec3(1.955562,1.736565,-0.119965)))*(power(abs(divide(rotate(rotate(hypot(vec3(p.x,t,p.y),myMin(abs(vec3(p.y,t,p.x)),power(abs(p2c(abs(vec3(p.y,p.x,t)))),abs(cnst(u,vec3(1.643181,0.751665,-1.122219)))))),vec3(p.x,p.y,t)),vec3(p.y,t,p.x)),(cnst(u,vec3(1.955562,1.736565,-0.119965)))-(myMin(divide((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(cnst(u,vec3(1.845742,1.710555,0.780517)))),sin((vec3(t,p.x,p.y))*3.1415927)),p2c(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.x,t,p.y))))/2.)),exp(rotate(-(cnst(u,vec3(-0.073542,-1.735372,1.927805))),cnst(u,vec3(1.883485,-0.669459,1.862767))))),logA(abs(rotate(c2p(exp(vec3(p.x,t,p.y))),cnst(u,vec3(-1.709003,1.218676,-0.887567))))))))))))),abs(p2c(vec3(p.y,t,p.x)))))),p2c(-(divide(logA(abs(hypot(myMax(cos((vec3(p.x,p.y,t))*3.1415927),(abs(logA(abs(sin((hypot((vec3(p.y,t,p.x))-(myMin(divide(abs(sqrtA(sin((hypot(cnst(u,vec3(1.845742,1.710555,0.780517)),c2p(cnst(u,vec3(-1.467095,0.882165,-1.054229)))))*3.1415927))),sin((vec3(p.y,p.x,t))*3.1415927)),vec3(p.x,t,p.y))),sin((vec3(p.x,p.y,t))*3.1415927)))*3.1415927)))))*(rotate(logA(abs(vec3(p.y,p.x,t))),(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.y,t,p.x))))/2.)),logA(abs(rotate(c2p(exp(cnst(u,vec3(-0.929638,-1.584967,0.847705)))),cnst(u,vec3(1.950307,0.065199,0.799913)))))),logA(abs(rotate(c2p(exp(vec3(p.y,t,p.x))),cnst(u,vec3(1.950307,0.065199,0.799913)))))))))+(hypot(abs((vec3(p.x,p.y,t))+(vec3(p.y,p.x,t))),vec3(t,p.x,p.y)))))),cnst(u,vec3(0.817616,0.758660,-1.700391))))),cnst(u,vec3(0.876495,0.383847,-0.397954))))))))))*(rotate(vec3(p.y,p.x,t),(abs(power(abs((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(sin(((vec3(t,p.x,p.y))-(cnst(u,vec3(-0.976102,1.916044,-1.123562))))*3.1415927)))),abs(exp(sqrtA(p2c(vec3(p.y,t,p.x))))))))+((abs(cnst(u,vec3(0.613423,-0.727868,1.108056))))-(cnst(u,vec3(-1.467095,0.882165,-1.054229))))))))*vec3(0.725,0.723,0.108);
+	v=cmp(v-vec3(16.),cmp(v+vec3(16.),vec3(0.),v),vec3(0.));
+	float h=v.z*6.2831853;
+	float x=v.y*cos(h)/3.,y=v.y*sin(h)/1.73205080757;
+	v=mod(abs(vec3(v.x+x+y,v.x-x-x,v.x+x-y))/2.,2.);
+	v=cmp(v-1.,v,2.-v);v=cmp(v,vec3(0.),pow(v,vec3(1.3491)));
+	float gr=(v.x+v.y+v.z)/3.,gm=1.2047;
+	v=cmp(v-vec3(gr),pow(v/gr,vec3(gm))*gr,1.-pow((vec3(1.)-v)/(1.-gr),vec3(gm))*(1.-gr));
+	vec3 p1=cmp(v-vec3(v.g,v.b,v.r),vec3(0.),vec3(4.,2.,1.));x=p1.x+p1.y+p1.z;
+	vec3 p2=(x==6.)?vec3(v.g-v.b,v.b,v.r):(x==2.)?vec3(v.g-v.r,v.b,v.g):
+		(x==3.)?vec3(v.b-v.r,v.r,v.g):(x==1.)?vec3(v.b-v.g,v.r,v.b):
+		(x==5.)?vec3(v.r-v.g,v.g,v.b):vec3(v.r-v.b,v.g,v.r);
+	p2.x=p2.x/(p2.z-p2.y);
+	h=mod((x==6.)?mix(0.202,0.144,p2.x):(x==2.)?mix(0.144,0.906,p2.x):(x==3.)?mix(0.906,0.365,p2.x):
+		(x==1.)?mix(0.365,0.224,p2.x):(x==5.)?mix(0.224,0.090,p2.x):mix(0.090,0.202,p2.x),1.);
+	h=((h<0.083378)?0.:(h<0.455900)?h*0.894801-0.074607:(h<0.794424)?h*0.984669-0.115578:
+		(h<0.849833)?h*1.503976-0.528128:h*0.554936+0.278397)*6.;
+	x=mod(h,1.);p1=vec3(p2.y,p2.z-x*(p2.z-p2.y),p2.z-(1.-x)*(p2.z-p2.y));
+	v=(p2.z==p2.y)?vec3(p2.z):
+		(h<1.)?vec3(p2.z,p1.z,p1.x):(h<2.)?vec3(p1.y,p2.z,p1.x):
+		(h<3.)?vec3(p1.x,p2.z,p1.z):(h<4.)?vec3(p1.x,p1.y,p2.z):
+		(h<5.)?vec3(p1.z,p1.x,p2.z):vec3(p2.z,p1.x,p1.y);
+	return v;
+}
+void main(void){
+	float th=T*6.2831853;
+	float t=sin(th)*0.485148+-0.454656;
+	float u=(1.-cos(th))/2.*0.485148+-0.454656;
+	vec2 p=((size.x>size.y)?vec2(pCoord.x*size.x/size.y,pCoord.y):vec2(pCoord.x,pCoord.y*size.y/size.x));
+	gl_FragColor=vec4(fn(p,t,u),1.);
+}
+</script>
+<script id="fs6" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec2 size;
+uniform float T;
+varying vec2 pCoord;
+vec3 cmp(vec3 a,vec3 b,vec3 c){
+	return vec3((a.x<0.)?b.x:c.x,(a.y<0.)?b.y:c.y,(a.z<0.)?b.z:c.z);}
+vec3 c2p(vec3 a){
+	return vec3(length(a),atan(a.y,a.x)/3.1415927,atan(a.z,length(a.xy))/3.1415927);}
+vec3 logA(vec3 a){return cmp(-a,log(a),vec3(0.));}
+vec3 myMin(vec3 a,vec3 b){return (a.x<b.x)?a:b;}
+vec3 cnst(float u,vec3 c){return c+c*vec3(u);}
+vec3 power(vec3 a, vec3 b){
+	return cmp(-a,cmp(-b,pow(a,b),cmp(-a,vec3(1.),vec3(0.))),vec3(0.));}
+vec3 divide(vec3 a, vec3 b){
+	return a/cmp(b,b,cmp(-b,b,vec3(1.)));}
+vec3 rotate(vec3 a,vec3 b){
+	b=(mod(b+1.,2.)-1.)*3.1415927;
+	vec3 s=sin(b),c=cos(b);
+	return vec3(dot(vec3(c.x*c.z+s.x*s.y*s.z,c.x*s.y*s.z-s.x*c.z,c.y*s.z),a),
+		dot(vec3(s.x*c.y,c.x*c.y,-s.y),a),
+		dot(vec3(c.x*s.z+s.x*s.y*c.z,c.y*c.z-s.x*s.z,c.y*c.z),a));}
+vec3 hypot(vec3 a,vec3 b){return sqrt(a*a+b*b);}
+vec3 p2c(vec3 a){
+	return vec3(cos(a.z*3.1415927)*cos(a.y*3.1415927),
+		cos(a.z*3.1415927)*sin(a.y*3.1415927),sin(a.z*3.1415927))*a.x;}
+vec3 sqrtA(vec3 a){return cmp(a,-sqrt(-a),sqrt(a));}
+vec3 myMax(vec3 a,vec3 b){return (a.x>b.x)?a:b;}
+vec3 fn(vec2 p,float t,float u){
+	p=p*vec2(0.507,0.693)+vec2(0.540,-0.174);
+	vec3 v=(c2p((abs(logA(abs(myMin(c2p((cnst(u,vec3(1.955562,1.736565,-0.119965)))-(power(abs(divide(rotate(rotate(hypot(vec3(p.x,t,p.y),myMin(abs(vec3(p.y,t,p.x)),power(abs(p2c(abs(vec3(p.y,p.x,t)))),abs(cnst(u,vec3(1.643181,0.751665,-1.122219)))))),vec3(p.x,p.y,t)),vec3(p.y,t,p.x)),(cnst(u,vec3(1.955562,1.736565,-0.119965)))-(myMin(divide((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(cnst(u,vec3(1.845742,1.710555,0.780517)))),sin((vec3(t,p.x,p.y))*3.1415927)),p2c(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.x,t,p.y))))/2.)),exp(rotate(-(cnst(u,vec3(-0.073542,-1.735372,1.927805))),cnst(u,vec3(1.883485,-0.669459,1.862767))))),logA(abs(rotate(c2p(exp(vec3(p.x,t,p.y))),cnst(u,vec3(-1.709003,1.218676,-0.887567))))))))))))),abs(p2c(vec3(p.y,t,p.x)))))),p2c(-(divide(logA(abs(hypot(myMax(cos((vec3(p.x,p.y,t))*3.1415927),(abs(logA(abs(sin((hypot((vec3(p.y,t,p.x))-(myMin(divide(abs(sqrtA(sin((hypot(cnst(u,vec3(1.845742,1.710555,0.780517)),c2p(cnst(u,vec3(-1.467095,0.882165,-1.054229)))))*3.1415927))),sin((vec3(p.y,p.x,t))*3.1415927)),vec3(p.x,t,p.y))),sin((vec3(p.x,p.y,t))*3.1415927)))*3.1415927)))))*(rotate(logA(abs(vec3(p.y,p.x,t))),(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.y,t,p.x))))/2.)),logA(abs(rotate(c2p(exp(cnst(u,vec3(-0.929638,-1.584967,0.847705)))),cnst(u,vec3(1.950307,0.065199,0.799913)))))),logA(abs(rotate(c2p(exp(vec3(p.y,t,p.x))),cnst(u,vec3(1.950307,0.065199,0.799913)))))))))+(hypot(abs(exp(vec3(p.x,p.y,t))),vec3(t,p.x,p.y)))))),cnst(u,vec3(0.817616,0.758660,-1.700391))))),cnst(u,vec3(0.876495,0.383847,-0.397954))))))))))*(rotate(vec3(p.y,p.x,t),(abs(power(abs((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(sin(((vec3(t,p.x,p.y))-(cnst(u,vec3(-0.976102,1.916044,-1.123562))))*3.1415927)))),abs(exp(sqrtA(p2c(vec3(p.y,t,p.x))))))))+((abs(cnst(u,vec3(0.613423,-0.727868,1.108056))))-(cnst(u,vec3(-1.467095,0.882165,-1.054229))))))))*vec3(0.625,0.493,0.070);
+	v=cmp(v-vec3(16.),cmp(v+vec3(16.),vec3(0.),v),vec3(0.));
+	float h=v.z*6.2831853;
+	float x=v.y*cos(h)/3.,y=v.y*sin(h)/1.73205080757;
+	v=mod(abs(vec3(v.x+x+y,v.x-x-x,v.x+x-y))/2.,2.);
+	v=cmp(v-1.,v,2.-v);v=cmp(v,vec3(0.),pow(v,vec3(1.1995)));
+	float gr=(v.x+v.y+v.z)/3.,gm=1.4272;
+	v=cmp(v-vec3(gr),pow(v/gr,vec3(gm))*gr,1.-pow((vec3(1.)-v)/(1.-gr),vec3(gm))*(1.-gr));
+	vec3 p1=cmp(v-vec3(v.g,v.b,v.r),vec3(0.),vec3(4.,2.,1.));x=p1.x+p1.y+p1.z;
+	vec3 p2=(x==6.)?vec3(v.g-v.b,v.b,v.r):(x==2.)?vec3(v.g-v.r,v.b,v.g):
+		(x==3.)?vec3(v.b-v.r,v.r,v.g):(x==1.)?vec3(v.b-v.g,v.r,v.b):
+		(x==5.)?vec3(v.r-v.g,v.g,v.b):vec3(v.r-v.b,v.g,v.r);
+	p2.x=p2.x/(p2.z-p2.y);
+	h=mod((x==6.)?mix(0.287,0.078,p2.x):(x==2.)?mix(0.078,0.019,p2.x):(x==3.)?mix(0.019,0.637,p2.x):
+		(x==1.)?mix(0.637,0.094,p2.x):(x==5.)?mix(0.094,0.835,p2.x):mix(0.835,0.287,p2.x),1.);
+	h=((h<0.083378)?0.:(h<0.455900)?h*0.894801-0.074607:(h<0.794424)?h*0.984669-0.115578:
+		(h<0.849833)?h*1.503976-0.528128:h*0.554936+0.278397)*6.;
+	x=mod(h,1.);p1=vec3(p2.y,p2.z-x*(p2.z-p2.y),p2.z-(1.-x)*(p2.z-p2.y));
+	v=(p2.z==p2.y)?vec3(p2.z):
+		(h<1.)?vec3(p2.z,p1.z,p1.x):(h<2.)?vec3(p1.y,p2.z,p1.x):
+		(h<3.)?vec3(p1.x,p2.z,p1.z):(h<4.)?vec3(p1.x,p1.y,p2.z):
+		(h<5.)?vec3(p1.z,p1.x,p2.z):vec3(p2.z,p1.x,p1.y);
+	return v;
+}
+void main(void){
+	float th=T*6.2831853;
+	float t=sin(th)*0.222412+-0.400913;
+	float u=(1.-cos(th))/2.*0.222412+-0.400913;
+	vec2 p=((size.x>size.y)?vec2(pCoord.x*size.x/size.y,pCoord.y):vec2(pCoord.x,pCoord.y*size.y/size.x));
+	gl_FragColor=vec4(fn(p,t,u),1.);
+}
+</script>
+<script id="fs7" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec2 size;
+uniform float T;
+varying vec2 pCoord;
+vec3 cmp(vec3 a,vec3 b,vec3 c){
+	return vec3((a.x<0.)?b.x:c.x,(a.y<0.)?b.y:c.y,(a.z<0.)?b.z:c.z);}
+vec3 c2p(vec3 a){
+	return vec3(length(a),atan(a.y,a.x)/3.1415927,atan(a.z,length(a.xy))/3.1415927);}
+vec3 logA(vec3 a){return cmp(-a,log(a),vec3(0.));}
+vec3 myMin(vec3 a,vec3 b){return (a.x<b.x)?a:b;}
+vec3 cnst(float u,vec3 c){return c+c*vec3(u);}
+vec3 power(vec3 a, vec3 b){
+	return cmp(-a,cmp(-b,pow(a,b),cmp(-a,vec3(1.),vec3(0.))),vec3(0.));}
+vec3 divide(vec3 a, vec3 b){
+	return a/cmp(b,b,cmp(-b,b,vec3(1.)));}
+vec3 rotate(vec3 a,vec3 b){
+	b=(mod(b+1.,2.)-1.)*3.1415927;
+	vec3 s=sin(b),c=cos(b);
+	return vec3(dot(vec3(c.x*c.z+s.x*s.y*s.z,c.x*s.y*s.z-s.x*c.z,c.y*s.z),a),
+		dot(vec3(s.x*c.y,c.x*c.y,-s.y),a),
+		dot(vec3(c.x*s.z+s.x*s.y*c.z,c.y*c.z-s.x*s.z,c.y*c.z),a));}
+vec3 hypot(vec3 a,vec3 b){return sqrt(a*a+b*b);}
+vec3 p2c(vec3 a){
+	return vec3(cos(a.z*3.1415927)*cos(a.y*3.1415927),
+		cos(a.z*3.1415927)*sin(a.y*3.1415927),sin(a.z*3.1415927))*a.x;}
+vec3 sqrtA(vec3 a){return cmp(a,-sqrt(-a),sqrt(a));}
+vec3 myMax(vec3 a,vec3 b){return (a.x>b.x)?a:b;}
+vec3 fn(vec2 p,float t,float u){
+	p=p*vec2(0.757,1.372)+vec2(0.671,-0.206);
+	vec3 v=(c2p((abs(logA(abs(myMin(c2p((cnst(u,vec3(1.955562,1.736565,-0.119965)))-(power(abs(divide(rotate(rotate(hypot(vec3(p.x,t,p.y),myMin(abs(vec3(p.y,t,p.x)),power(abs(p2c(abs(vec3(p.y,p.x,t)))),abs(cnst(u,vec3(1.643181,0.751665,-1.122219)))))),vec3(p.x,p.y,t)),vec3(p.y,t,p.x)),(cnst(u,vec3(1.955562,1.736565,-0.119965)))-(myMin(divide((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(cnst(u,vec3(1.845742,1.710555,0.780517)))),sin((vec3(t,p.x,p.y))*3.1415927)),p2c(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.x,t,p.y))))/2.)),exp(-(cnst(u,vec3(1.883485,-0.669459,1.862767))))),logA(abs(rotate(c2p(exp(vec3(p.x,t,p.y))),cnst(u,vec3(-1.709003,1.218676,-0.887567))))))))))))),abs(p2c(vec3(p.y,t,p.x)))))),p2c(-(divide(logA(abs(hypot(myMax(cos((vec3(p.x,p.y,t))*3.1415927),(abs(logA(abs(sin((hypot((vec3(p.y,t,p.x))-(myMin(divide(abs(sqrtA(sin((hypot(cnst(u,vec3(1.845742,1.710555,0.780517)),c2p(cnst(u,vec3(-1.467095,0.882165,-1.054229)))))*3.1415927))),sin((vec3(p.y,p.x,t))*3.1415927)),vec3(p.x,t,p.y))),sin((vec3(p.x,p.y,t))*3.1415927)))*3.1415927)))))*(rotate(logA(abs(vec3(p.y,p.x,t))),(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.y,t,p.x))))/2.)),logA(abs(rotate(c2p(exp(cnst(u,vec3(-0.929638,-1.584967,0.847705)))),cnst(u,vec3(1.950307,0.065199,0.799913)))))),logA(abs(rotate(c2p(exp(vec3(p.y,t,p.x))),cnst(u,vec3(1.950307,0.065199,0.799913)))))))))+(hypot(abs((vec3(p.x,p.y,t))+(vec3(p.y,p.x,t))),vec3(t,p.x,p.y)))))),cnst(u,vec3(0.817616,0.758660,-1.700391))))),cnst(u,vec3(0.876495,0.383847,-0.397954))))))))))*(rotate(vec3(p.y,p.x,t),(abs(power(abs((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(sin(((vec3(t,p.x,p.y))-(cnst(u,vec3(-0.976102,1.916044,-1.123562))))*3.1415927)))),abs(exp(sqrtA(p2c(vec3(p.y,t,p.x))))))))+((abs(cnst(u,vec3(0.613423,-0.727868,1.108056))))-(cnst(u,vec3(-1.467095,0.882165,-1.054229))))))))*vec3(0.565,0.639,0.174);
+	v=cmp(v-vec3(16.),cmp(v+vec3(16.),vec3(0.),v),vec3(0.));
+	float h=v.z*6.2831853;
+	float x=v.y*cos(h)/3.,y=v.y*sin(h)/1.73205080757;
+	v=mod(abs(vec3(v.x+x+y,v.x-x-x,v.x+x-y))/2.,2.);
+	v=cmp(v-1.,v,2.-v);v=cmp(v,vec3(0.),pow(v,vec3(1.2818)));
+	float gr=(v.x+v.y+v.z)/3.,gm=1.0369;
+	v=cmp(v-vec3(gr),pow(v/gr,vec3(gm))*gr,1.-pow((vec3(1.)-v)/(1.-gr),vec3(gm))*(1.-gr));
+	vec3 p1=cmp(v-vec3(v.g,v.b,v.r),vec3(0.),vec3(4.,2.,1.));x=p1.x+p1.y+p1.z;
+	vec3 p2=(x==6.)?vec3(v.g-v.b,v.b,v.r):(x==2.)?vec3(v.g-v.r,v.b,v.g):
+		(x==3.)?vec3(v.b-v.r,v.r,v.g):(x==1.)?vec3(v.b-v.g,v.r,v.b):
+		(x==5.)?vec3(v.r-v.g,v.g,v.b):vec3(v.r-v.b,v.g,v.r);
+	p2.x=p2.x/(p2.z-p2.y);
+	h=mod((x==6.)?mix(0.360,0.133,p2.x):(x==2.)?mix(0.133,0.015,p2.x):(x==3.)?mix(0.015,0.332,p2.x):
+		(x==1.)?mix(0.332,0.494,p2.x):(x==5.)?mix(0.494,0.087,p2.x):mix(0.087,0.360,p2.x),1.);
+	h=((h<0.083378)?0.:(h<0.455900)?h*0.894801-0.074607:(h<0.794424)?h*0.984669-0.115578:
+		(h<0.849833)?h*1.503976-0.528128:h*0.554936+0.278397)*6.;
+	x=mod(h,1.);p1=vec3(p2.y,p2.z-x*(p2.z-p2.y),p2.z-(1.-x)*(p2.z-p2.y));
+	v=(p2.z==p2.y)?vec3(p2.z):
+		(h<1.)?vec3(p2.z,p1.z,p1.x):(h<2.)?vec3(p1.y,p2.z,p1.x):
+		(h<3.)?vec3(p1.x,p2.z,p1.z):(h<4.)?vec3(p1.x,p1.y,p2.z):
+		(h<5.)?vec3(p1.z,p1.x,p2.z):vec3(p2.z,p1.x,p1.y);
+	return v;
+}
+void main(void){
+	float th=T*6.2831853;
+	float t=sin(th)*0.925632+-0.538431;
+	float u=(1.-cos(th))/2.*0.925632+-0.538431;
+	vec2 p=((size.x>size.y)?vec2(pCoord.x*size.x/size.y,pCoord.y):vec2(pCoord.x,pCoord.y*size.y/size.x));
+	gl_FragColor=vec4(fn(p,t,u),1.);
+}
+</script>
+<script id="fs8" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec2 size;
+uniform float T;
+varying vec2 pCoord;
+vec3 cmp(vec3 a,vec3 b,vec3 c){
+	return vec3((a.x<0.)?b.x:c.x,(a.y<0.)?b.y:c.y,(a.z<0.)?b.z:c.z);}
+vec3 c2p(vec3 a){
+	return vec3(length(a),atan(a.y,a.x)/3.1415927,atan(a.z,length(a.xy))/3.1415927);}
+vec3 logA(vec3 a){return cmp(-a,log(a),vec3(0.));}
+vec3 myMin(vec3 a,vec3 b){return (a.x<b.x)?a:b;}
+vec3 cnst(float u,vec3 c){return c+c*vec3(u);}
+vec3 power(vec3 a, vec3 b){
+	return cmp(-a,cmp(-b,pow(a,b),cmp(-a,vec3(1.),vec3(0.))),vec3(0.));}
+vec3 divide(vec3 a, vec3 b){
+	return a/cmp(b,b,cmp(-b,b,vec3(1.)));}
+vec3 rotate(vec3 a,vec3 b){
+	b=(mod(b+1.,2.)-1.)*3.1415927;
+	vec3 s=sin(b),c=cos(b);
+	return vec3(dot(vec3(c.x*c.z+s.x*s.y*s.z,c.x*s.y*s.z-s.x*c.z,c.y*s.z),a),
+		dot(vec3(s.x*c.y,c.x*c.y,-s.y),a),
+		dot(vec3(c.x*s.z+s.x*s.y*c.z,c.y*c.z-s.x*s.z,c.y*c.z),a));}
+vec3 hypot(vec3 a,vec3 b){return sqrt(a*a+b*b);}
+vec3 p2c(vec3 a){
+	return vec3(cos(a.z*3.1415927)*cos(a.y*3.1415927),
+		cos(a.z*3.1415927)*sin(a.y*3.1415927),sin(a.z*3.1415927))*a.x;}
+vec3 sqrtA(vec3 a){return cmp(a,-sqrt(-a),sqrt(a));}
+vec3 myMax(vec3 a,vec3 b){return (a.x>b.x)?a:b;}
+vec3 fn(vec2 p,float t,float u){
+	p=p*vec2(1.000,1.158)+vec2(0.268,-0.490);
+	vec3 v=(c2p((abs(logA(abs(myMin(c2p((cnst(u,vec3(1.955562,1.736565,-0.119965)))-(power(abs(divide(rotate(rotate(hypot(vec3(p.x,t,p.y),myMin(abs(vec3(p.y,t,p.x)),power(abs(p2c(abs(vec3(p.y,p.x,t)))),abs(cnst(u,vec3(1.643181,0.751665,-1.122219)))))),vec3(p.x,p.y,t)),vec3(p.y,t,p.x)),(cnst(u,vec3(1.955562,1.736565,-0.119965)))-(myMin(divide((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(cnst(u,vec3(1.845742,1.710555,0.780517)))),sin((vec3(t,p.x,p.y))*3.1415927)),p2c(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.x,t,p.y))))/2.)),exp(rotate(-(cnst(u,vec3(-0.073542,-1.735372,1.927805))),cnst(u,vec3(1.883485,-0.669459,1.862767))))),logA(abs(rotate(c2p(exp(vec3(p.x,t,p.y))),cnst(u,vec3(-1.709003,1.218676,-0.887567))))))))))))),abs(p2c(vec3(p.y,t,p.x)))))),p2c(-(divide(logA(abs(hypot(myMax(cos((vec3(p.x,p.y,t))*3.1415927),(abs(logA(abs(sin((hypot((vec3(p.y,t,p.x))-(myMin(divide(((myMin(cnst(u,vec3(1.979121,0.672061,1.971752)),vec3(p.y,t,p.x)))+(cnst(u,vec3(1.046136,-1.846533,1.563201))))-(sqrtA(sin((hypot(cnst(u,vec3(1.845742,1.710555,0.780517)),c2p(cnst(u,vec3(-1.467095,0.882165,-1.054229)))))*3.1415927))),sin((vec3(p.y,p.x,t))*3.1415927)),vec3(p.x,t,p.y))),sin((vec3(p.x,p.y,t))*3.1415927)))*3.1415927)))))*(rotate(logA(abs(vec3(p.y,p.x,t))),(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.y,t,p.x))))/2.)),logA(abs(rotate(c2p(exp(cnst(u,vec3(-0.929638,-1.584967,0.847705)))),cnst(u,vec3(1.950307,0.065199,0.799913)))))),logA(abs(rotate(c2p(exp(vec3(p.y,t,p.x))),cnst(u,vec3(1.950307,0.065199,0.799913)))))))))+(hypot(abs((vec3(p.x,p.y,t))+(vec3(p.y,p.x,t))),vec3(t,p.x,p.y)))))),cnst(u,vec3(0.817616,0.758660,-1.700391))))),cnst(u,vec3(0.876495,0.383847,-0.397954))))))))))*(rotate(vec3(p.y,p.x,t),(abs(power(abs((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(sin(((vec3(t,p.x,p.y))-(cnst(u,vec3(-0.976102,1.916044,-1.123562))))*3.1415927)))),abs(exp(sqrtA(p2c(vec3(p.y,t,p.x))))))))+((abs(cnst(u,vec3(0.613423,-0.727868,1.108056))))-(cnst(u,vec3(-1.467095,0.882165,-1.054229))))))))*vec3(0.560,0.934,0.191);
+	v=cmp(v-vec3(16.),cmp(v+vec3(16.),vec3(0.),v),vec3(0.));
+	float h=v.z*6.2831853;
+	float x=v.y*cos(h)/3.,y=v.y*sin(h)/1.73205080757;
+	v=mod(abs(vec3(v.x+x+y,v.x-x-x,v.x+x-y))/2.,2.);
+	v=cmp(v-1.,v,2.-v);v=cmp(v,vec3(0.),pow(v,vec3(1.3968)));
+	float gr=(v.x+v.y+v.z)/3.,gm=1.0909;
+	v=cmp(v-vec3(gr),pow(v/gr,vec3(gm))*gr,1.-pow((vec3(1.)-v)/(1.-gr),vec3(gm))*(1.-gr));
+	vec3 p1=cmp(v-vec3(v.g,v.b,v.r),vec3(0.),vec3(4.,2.,1.));x=p1.x+p1.y+p1.z;
+	vec3 p2=(x==6.)?vec3(v.g-v.b,v.b,v.r):(x==2.)?vec3(v.g-v.r,v.b,v.g):
+		(x==3.)?vec3(v.b-v.r,v.r,v.g):(x==1.)?vec3(v.b-v.g,v.r,v.b):
+		(x==5.)?vec3(v.r-v.g,v.g,v.b):vec3(v.r-v.b,v.g,v.r);
+	p2.x=p2.x/(p2.z-p2.y);
+	h=mod((x==6.)?mix(0.055,0.246,p2.x):(x==2.)?mix(0.246,0.238,p2.x):(x==3.)?mix(0.238,0.361,p2.x):
+		(x==1.)?mix(0.361,0.534,p2.x):(x==5.)?mix(0.534,0.187,p2.x):mix(0.187,0.055,p2.x),1.);
+	h=((h<0.083378)?0.:(h<0.455900)?h*0.894801-0.074607:(h<0.794424)?h*0.984669-0.115578:
+		(h<0.849833)?h*1.503976-0.528128:h*0.554936+0.278397)*6.;
+	x=mod(h,1.);p1=vec3(p2.y,p2.z-x*(p2.z-p2.y),p2.z-(1.-x)*(p2.z-p2.y));
+	v=(p2.z==p2.y)?vec3(p2.z):
+		(h<1.)?vec3(p2.z,p1.z,p1.x):(h<2.)?vec3(p1.y,p2.z,p1.x):
+		(h<3.)?vec3(p1.x,p2.z,p1.z):(h<4.)?vec3(p1.x,p1.y,p2.z):
+		(h<5.)?vec3(p1.z,p1.x,p2.z):vec3(p2.z,p1.x,p1.y);
+	return v;
+}
+void main(void){
+	float th=T*6.2831853;
+	float t=sin(th)*0.624690+-0.422194;
+	float u=(1.-cos(th))/2.*0.624690+-0.422194;
+	vec2 p=((size.x>size.y)?vec2(pCoord.x*size.x/size.y,pCoord.y):vec2(pCoord.x,pCoord.y*size.y/size.x));
+	gl_FragColor=vec4(fn(p,t,u),1.);
+}
+</script>
+<script id="fs9" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec2 size;
+uniform float T;
+varying vec2 pCoord;
+vec3 cmp(vec3 a,vec3 b,vec3 c){
+	return vec3((a.x<0.)?b.x:c.x,(a.y<0.)?b.y:c.y,(a.z<0.)?b.z:c.z);}
+vec3 c2p(vec3 a){
+	return vec3(length(a),atan(a.y,a.x)/3.1415927,atan(a.z,length(a.xy))/3.1415927);}
+vec3 logA(vec3 a){return cmp(-a,log(a),vec3(0.));}
+vec3 myMin(vec3 a,vec3 b){return (a.x<b.x)?a:b;}
+vec3 cnst(float u,vec3 c){return c+c*vec3(u);}
+vec3 power(vec3 a, vec3 b){
+	return cmp(-a,cmp(-b,pow(a,b),cmp(-a,vec3(1.),vec3(0.))),vec3(0.));}
+vec3 divide(vec3 a, vec3 b){
+	return a/cmp(b,b,cmp(-b,b,vec3(1.)));}
+vec3 rotate(vec3 a,vec3 b){
+	b=(mod(b+1.,2.)-1.)*3.1415927;
+	vec3 s=sin(b),c=cos(b);
+	return vec3(dot(vec3(c.x*c.z+s.x*s.y*s.z,c.x*s.y*s.z-s.x*c.z,c.y*s.z),a),
+		dot(vec3(s.x*c.y,c.x*c.y,-s.y),a),
+		dot(vec3(c.x*s.z+s.x*s.y*c.z,c.y*c.z-s.x*s.z,c.y*c.z),a));}
+vec3 hypot(vec3 a,vec3 b){return sqrt(a*a+b*b);}
+vec3 p2c(vec3 a){
+	return vec3(cos(a.z*3.1415927)*cos(a.y*3.1415927),
+		cos(a.z*3.1415927)*sin(a.y*3.1415927),sin(a.z*3.1415927))*a.x;}
+vec3 sqrtA(vec3 a){return cmp(a,-sqrt(-a),sqrt(a));}
+vec3 myMax(vec3 a,vec3 b){return (a.x>b.x)?a:b;}
+vec3 fn(vec2 p,float t,float u){
+	p=p*vec2(0.805,0.772)+vec2(0.016,-0.005);
+	vec3 v=(c2p((abs(logA(abs(myMin(c2p((cnst(u,vec3(1.955562,1.736565,-0.119965)))-(power(abs(divide(rotate(rotate(hypot(vec3(p.x,t,p.y),myMin(abs(vec3(p.y,t,p.x)),power(abs(p2c(abs(vec3(p.y,p.x,t)))),abs(cnst(u,vec3(1.643181,0.751665,-1.122219)))))),vec3(p.x,p.y,t)),vec3(p.y,t,p.x)),(cnst(u,vec3(1.955562,1.736565,-0.119965)))-(myMin(divide((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(cnst(u,vec3(1.845742,1.710555,0.780517)))),sin((vec3(t,p.x,p.y))*3.1415927)),p2c(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.x,t,p.y))))/2.)),exp(rotate(-(cnst(u,vec3(-0.073542,-1.735372,1.927805))),cnst(u,vec3(1.883485,-0.669459,1.862767))))),vec3(p.x,t,p.y))))))))),abs(p2c(vec3(p.y,t,p.x)))))),p2c(-(divide(logA(abs(hypot(myMax(cos((vec3(p.x,p.y,t))*3.1415927),(abs(logA(abs(sin((hypot((vec3(p.y,t,p.x))-(myMin(divide(abs(sqrtA(sin((hypot(cnst(u,vec3(1.845742,1.710555,0.780517)),c2p(cnst(u,vec3(-1.467095,0.882165,-1.054229)))))*3.1415927))),sin((vec3(p.y,p.x,t))*3.1415927)),vec3(p.x,t,p.y))),sin((vec3(p.x,p.y,t))*3.1415927)))*3.1415927)))))*(rotate(logA(abs(vec3(p.y,p.x,t))),(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.y,t,p.x))))/2.)),logA(abs(rotate(c2p(exp(cnst(u,vec3(-0.929638,-1.584967,0.847705)))),cnst(u,vec3(1.950307,0.065199,0.799913)))))),logA(abs(rotate(c2p(exp(vec3(p.y,t,p.x))),cnst(u,vec3(1.950307,0.065199,0.799913)))))))))+(hypot(abs((vec3(p.x,p.y,t))+(vec3(p.y,p.x,t))),vec3(t,p.x,p.y)))))),cnst(u,vec3(0.817616,0.758660,-1.700391))))),cnst(u,vec3(0.876495,0.383847,-0.397954))))))))))*(rotate(vec3(p.y,p.x,t),(abs(power(abs((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(sin(((vec3(t,p.x,p.y))-(cnst(u,vec3(-0.976102,1.916044,-1.123562))))*3.1415927)))),abs(exp(sqrtA(p2c(vec3(p.y,t,p.x))))))))+((abs(cnst(u,vec3(0.613423,-0.727868,1.108056))))-(cnst(u,vec3(-1.467095,0.882165,-1.054229))))))))*vec3(0.515,1.671,0.148);
+	v=cmp(v-vec3(16.),cmp(v+vec3(16.),vec3(0.),v),vec3(0.));
+	float h=v.z*6.2831853;
+	float x=v.y*cos(h)/3.,y=v.y*sin(h)/1.73205080757;
+	v=mod(abs(vec3(v.x+x+y,v.x-x-x,v.x+x-y))/2.,2.);
+	v=cmp(v-1.,v,2.-v);v=cmp(v,vec3(0.),pow(v,vec3(1.2826)));
+	float gr=(v.x+v.y+v.z)/3.,gm=1.0137;
+	v=cmp(v-vec3(gr),pow(v/gr,vec3(gm))*gr,1.-pow((vec3(1.)-v)/(1.-gr),vec3(gm))*(1.-gr));
+	vec3 p1=cmp(v-vec3(v.g,v.b,v.r),vec3(0.),vec3(4.,2.,1.));x=p1.x+p1.y+p1.z;
+	vec3 p2=(x==6.)?vec3(v.g-v.b,v.b,v.r):(x==2.)?vec3(v.g-v.r,v.b,v.g):
+		(x==3.)?vec3(v.b-v.r,v.r,v.g):(x==1.)?vec3(v.b-v.g,v.r,v.b):
+		(x==5.)?vec3(v.r-v.g,v.g,v.b):vec3(v.r-v.b,v.g,v.r);
+	p2.x=p2.x/(p2.z-p2.y);
+	h=mod((x==6.)?mix(0.417,0.543,p2.x):(x==2.)?mix(0.543,0.196,p2.x):(x==3.)?mix(0.196,0.395,p2.x):
+		(x==1.)?mix(0.395,0.403,p2.x):(x==5.)?mix(0.403,0.024,p2.x):mix(0.024,0.417,p2.x),1.);
+	h=((h<0.083378)?0.:(h<0.455900)?h*0.894801-0.074607:(h<0.794424)?h*0.984669-0.115578:
+		(h<0.849833)?h*1.503976-0.528128:h*0.554936+0.278397)*6.;
+	x=mod(h,1.);p1=vec3(p2.y,p2.z-x*(p2.z-p2.y),p2.z-(1.-x)*(p2.z-p2.y));
+	v=(p2.z==p2.y)?vec3(p2.z):
+		(h<1.)?vec3(p2.z,p1.z,p1.x):(h<2.)?vec3(p1.y,p2.z,p1.x):
+		(h<3.)?vec3(p1.x,p2.z,p1.z):(h<4.)?vec3(p1.x,p1.y,p2.z):
+		(h<5.)?vec3(p1.z,p1.x,p2.z):vec3(p2.z,p1.x,p1.y);
+	return v;
+}
+void main(void){
+	float th=T*6.2831853;
+	float t=sin(th)*0.594316+-0.390000;
+	float u=(1.-cos(th))/2.*0.594316+-0.390000;
+	vec2 p=((size.x>size.y)?vec2(pCoord.x*size.x/size.y,pCoord.y):vec2(pCoord.x,pCoord.y*size.y/size.x));
+	gl_FragColor=vec4(fn(p,t,u),1.);
+}
+</script>
+<script id="fs10" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec2 size;
+uniform float T;
+varying vec2 pCoord;
+vec3 cmp(vec3 a,vec3 b,vec3 c){
+	return vec3((a.x<0.)?b.x:c.x,(a.y<0.)?b.y:c.y,(a.z<0.)?b.z:c.z);}
+vec3 c2p(vec3 a){
+	return vec3(length(a),atan(a.y,a.x)/3.1415927,atan(a.z,length(a.xy))/3.1415927);}
+vec3 logA(vec3 a){return cmp(-a,log(a),vec3(0.));}
+vec3 myMin(vec3 a,vec3 b){return (a.x<b.x)?a:b;}
+vec3 cnst(float u,vec3 c){return c+c*vec3(u);}
+vec3 power(vec3 a, vec3 b){
+	return cmp(-a,cmp(-b,pow(a,b),cmp(-a,vec3(1.),vec3(0.))),vec3(0.));}
+vec3 divide(vec3 a, vec3 b){
+	return a/cmp(b,b,cmp(-b,b,vec3(1.)));}
+vec3 rotate(vec3 a,vec3 b){
+	b=(mod(b+1.,2.)-1.)*3.1415927;
+	vec3 s=sin(b),c=cos(b);
+	return vec3(dot(vec3(c.x*c.z+s.x*s.y*s.z,c.x*s.y*s.z-s.x*c.z,c.y*s.z),a),
+		dot(vec3(s.x*c.y,c.x*c.y,-s.y),a),
+		dot(vec3(c.x*s.z+s.x*s.y*c.z,c.y*c.z-s.x*s.z,c.y*c.z),a));}
+vec3 hypot(vec3 a,vec3 b){return sqrt(a*a+b*b);}
+vec3 p2c(vec3 a){
+	return vec3(cos(a.z*3.1415927)*cos(a.y*3.1415927),
+		cos(a.z*3.1415927)*sin(a.y*3.1415927),sin(a.z*3.1415927))*a.x;}
+vec3 sqrtA(vec3 a){return cmp(a,-sqrt(-a),sqrt(a));}
+vec3 myMax(vec3 a,vec3 b){return (a.x>b.x)?a:b;}
+vec3 fn(vec2 p,float t,float u){
+	p=p*vec2(0.892,0.850)+vec2(0.821,-0.215);
+	vec3 v=(c2p((abs(logA(abs(myMin(c2p((cnst(u,vec3(1.955562,1.736565,-0.119965)))-(power(abs(divide(rotate(rotate(hypot(vec3(p.x,t,p.y),myMin(abs(vec3(p.y,t,p.x)),power(abs(p2c(abs(vec3(p.y,p.x,t)))),abs(cnst(u,vec3(1.643181,0.751665,-1.122219)))))),vec3(p.x,p.y,t)),vec3(p.y,t,p.x)),(cnst(u,vec3(1.955562,1.736565,-0.119965)))-(myMin(divide((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(cnst(u,vec3(1.845742,1.710555,0.780517)))),sin((vec3(t,p.x,p.y))*3.1415927)),p2c(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.x,t,p.y))))/2.)),exp(rotate(-(cnst(u,vec3(-0.073542,-1.735372,1.927805))),cnst(u,vec3(1.883485,-0.669459,1.862767))))),logA(abs(rotate(c2p(exp(vec3(p.x,t,p.y))),cnst(u,vec3(-1.709003,1.218676,-0.887567))))))))))))),abs(p2c(vec3(p.y,t,p.x)))))),p2c(-(divide(logA(abs(hypot(myMax(cos((vec3(p.x,p.y,t))*3.1415927),(abs(logA(abs(sin((hypot((vec3(p.y,t,p.x))-(myMin(divide(abs(sqrtA(sin((hypot(cnst(u,vec3(1.845742,1.710555,0.780517)),c2p(cnst(u,vec3(-1.467095,0.882165,-1.054229)))))*3.1415927))),sin((vec3(p.y,p.x,t))*3.1415927)),vec3(p.x,t,p.y))),sin((vec3(p.x,p.y,t))*3.1415927)))*3.1415927)))))*(rotate(logA(abs(vec3(p.y,p.x,t))),(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.y,t,p.x))))/2.)),logA(abs(rotate(c2p(exp(cnst(u,vec3(-0.929638,-1.584967,0.847705)))),cnst(u,vec3(1.950307,0.065199,0.799913)))))),logA(abs(rotate(c2p(exp(vec3(p.y,t,p.x))),cnst(u,vec3(1.950307,0.065199,0.799913)))))))))+(hypot(abs((vec3(p.x,p.y,t))+(vec3(p.y,p.x,t))),vec3(t,p.x,p.y)))))),cnst(u,vec3(0.817616,0.758660,-1.700391))))),cnst(u,vec3(0.876495,0.383847,-0.397954))))))))))*(rotate(vec3(p.y,p.x,t),(abs(power(abs((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(sin(((vec3(t,p.x,p.y))-(cnst(u,vec3(-0.976102,1.916044,-1.123562))))*3.1415927)))),abs(exp(sqrtA(p2c(vec3(p.y,t,p.x))))))))+(cnst(u,vec3(-1.081194,0.983193,0.664606)))))))*vec3(0.644,1.005,0.135);
+	v=cmp(v-vec3(16.),cmp(v+vec3(16.),vec3(0.),v),vec3(0.));
+	float h=v.z*6.2831853;
+	float x=v.y*cos(h)/3.,y=v.y*sin(h)/1.73205080757;
+	v=mod(abs(vec3(v.x+x+y,v.x-x-x,v.x+x-y))/2.,2.);
+	v=cmp(v-1.,v,2.-v);v=cmp(v,vec3(0.),pow(v,vec3(1.2096)));
+	float gr=(v.x+v.y+v.z)/3.,gm=1.0344;
+	v=cmp(v-vec3(gr),pow(v/gr,vec3(gm))*gr,1.-pow((vec3(1.)-v)/(1.-gr),vec3(gm))*(1.-gr));
+	vec3 p1=cmp(v-vec3(v.g,v.b,v.r),vec3(0.),vec3(4.,2.,1.));x=p1.x+p1.y+p1.z;
+	vec3 p2=(x==6.)?vec3(v.g-v.b,v.b,v.r):(x==2.)?vec3(v.g-v.r,v.b,v.g):
+		(x==3.)?vec3(v.b-v.r,v.r,v.g):(x==1.)?vec3(v.b-v.g,v.r,v.b):
+		(x==5.)?vec3(v.r-v.g,v.g,v.b):vec3(v.r-v.b,v.g,v.r);
+	p2.x=p2.x/(p2.z-p2.y);
+	h=mod((x==6.)?mix(0.110,0.191,p2.x):(x==2.)?mix(0.191,0.010,p2.x):(x==3.)?mix(0.010,0.315,p2.x):
+		(x==1.)?mix(0.315,0.406,p2.x):(x==5.)?mix(0.406,0.085,p2.x):mix(0.085,0.110,p2.x),1.);
+	h=((h<0.083378)?0.:(h<0.455900)?h*0.894801-0.074607:(h<0.794424)?h*0.984669-0.115578:
+		(h<0.849833)?h*1.503976-0.528128:h*0.554936+0.278397)*6.;
+	x=mod(h,1.);p1=vec3(p2.y,p2.z-x*(p2.z-p2.y),p2.z-(1.-x)*(p2.z-p2.y));
+	v=(p2.z==p2.y)?vec3(p2.z):
+		(h<1.)?vec3(p2.z,p1.z,p1.x):(h<2.)?vec3(p1.y,p2.z,p1.x):
+		(h<3.)?vec3(p1.x,p2.z,p1.z):(h<4.)?vec3(p1.x,p1.y,p2.z):
+		(h<5.)?vec3(p1.z,p1.x,p2.z):vec3(p2.z,p1.x,p1.y);
+	return v;
+}
+void main(void){
+	float th=T*6.2831853;
+	float t=sin(th)*0.561423+-0.420000;
+	float u=(1.-cos(th))/2.*0.561423+-0.420000;
+	vec2 p=((size.x>size.y)?vec2(pCoord.x*size.x/size.y,pCoord.y):vec2(pCoord.x,pCoord.y*size.y/size.x));
+	gl_FragColor=vec4(fn(p,t,u),1.);
+}
+</script>
+<script id="fs11" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec2 size;
+uniform float T;
+varying vec2 pCoord;
+vec3 cmp(vec3 a,vec3 b,vec3 c){
+	return vec3((a.x<0.)?b.x:c.x,(a.y<0.)?b.y:c.y,(a.z<0.)?b.z:c.z);}
+vec3 c2p(vec3 a){
+	return vec3(length(a),atan(a.y,a.x)/3.1415927,atan(a.z,length(a.xy))/3.1415927);}
+vec3 logA(vec3 a){return cmp(-a,log(a),vec3(0.));}
+vec3 myMin(vec3 a,vec3 b){return (a.x<b.x)?a:b;}
+vec3 cnst(float u,vec3 c){return c+c*vec3(u);}
+vec3 power(vec3 a, vec3 b){
+	return cmp(-a,cmp(-b,pow(a,b),cmp(-a,vec3(1.),vec3(0.))),vec3(0.));}
+vec3 divide(vec3 a, vec3 b){
+	return a/cmp(b,b,cmp(-b,b,vec3(1.)));}
+vec3 rotate(vec3 a,vec3 b){
+	b=(mod(b+1.,2.)-1.)*3.1415927;
+	vec3 s=sin(b),c=cos(b);
+	return vec3(dot(vec3(c.x*c.z+s.x*s.y*s.z,c.x*s.y*s.z-s.x*c.z,c.y*s.z),a),
+		dot(vec3(s.x*c.y,c.x*c.y,-s.y),a),
+		dot(vec3(c.x*s.z+s.x*s.y*c.z,c.y*c.z-s.x*s.z,c.y*c.z),a));}
+vec3 hypot(vec3 a,vec3 b){return sqrt(a*a+b*b);}
+vec3 p2c(vec3 a){
+	return vec3(cos(a.z*3.1415927)*cos(a.y*3.1415927),
+		cos(a.z*3.1415927)*sin(a.y*3.1415927),sin(a.z*3.1415927))*a.x;}
+vec3 sqrtA(vec3 a){return cmp(a,-sqrt(-a),sqrt(a));}
+vec3 myMax(vec3 a,vec3 b){return (a.x>b.x)?a:b;}
+vec3 fn(vec2 p,float t,float u){
+	p=p*vec2(0.614,1.094)+vec2(0.841,0.369);
+	vec3 v=(c2p((abs(logA(abs(myMin(c2p((cnst(u,vec3(1.955562,1.736565,-0.119965)))-(power(abs(divide(rotate(rotate(hypot(vec3(p.x,t,p.y),myMin(abs(cnst(u,vec3(0.766320,-0.466010,-1.385704))),power(abs(p2c(abs(vec3(p.y,p.x,t)))),abs(cnst(u,vec3(1.643181,0.751665,-1.122219)))))),vec3(p.x,p.y,t)),vec3(p.y,t,p.x)),(cnst(u,vec3(1.955562,1.736565,-0.119965)))-(myMin(divide((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(cnst(u,vec3(1.845742,1.710555,0.780517)))),sin((vec3(t,p.x,p.y))*3.1415927)),p2c(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(power(abs(cnst(u,vec3(1.639387,0.961843,0.626680))),abs(vec3(p.x,t,p.y)))))/2.)),-(cnst(u,vec3(-0.073542,-1.735372,1.927805)))),logA(abs(rotate(c2p(myMax(vec3(p.x,t,p.y),rotate(cos((vec3(p.y,p.x,t))*3.1415927),vec3(t,p.y,p.x)))),cnst(u,vec3(-1.709003,1.218676,-0.887567))))))))))))),abs(p2c(vec3(p.y,t,p.x)))))),p2c(-(divide(logA(abs(hypot(myMax(cos((vec3(p.x,p.y,t))*3.1415927),(abs(logA(abs(sin((hypot((vec3(p.y,t,p.x))-(myMin(divide((vec3(t,p.y,p.x))*(sqrtA(sin((hypot((cnst(u,vec3(1.845742,1.710555,0.780517)))*(abs(cnst(u,vec3(0.599938,1.039770,-1.971348)))),c2p(cnst(u,vec3(-1.467095,0.882165,-1.054229)))))*3.1415927))),sin((vec3(p.y,p.x,t))*3.1415927)),vec3(p.x,t,p.y))),sin((vec3(p.x,p.y,t))*3.1415927)))*3.1415927)))))*(rotate(logA(abs(vec3(p.y,p.x,t))),(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.y,t,p.x))))/2.)),logA(abs(rotate(c2p(exp(cnst(u,vec3(-0.929638,-1.584967,0.847705)))),cnst(u,vec3(1.950307,0.065199,0.799913)))))),logA(abs(rotate(c2p(exp(vec3(p.y,t,p.x))),cnst(u,vec3(1.950307,0.065199,0.799913)))))))))+(hypot(abs((vec3(p.x,p.y,t))+(vec3(p.y,p.x,t))),vec3(t,p.x,p.y)))))),cnst(u,vec3(0.817616,0.758660,-1.700391))))),cnst(u,vec3(0.876495,0.383847,-0.397954))))))))))*(rotate(vec3(p.y,p.x,t),(abs(power(abs((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(sin(((vec3(t,p.x,p.y))-(cnst(u,vec3(-0.976102,1.916044,-1.123562))))*3.1415927)))),abs(exp(sqrtA(p2c(vec3(p.y,t,p.x))))))))+((divide(logA(abs(vec3(t,p.y,p.x))),cnst(u,vec3(0.613423,-0.727868,1.108056))))-(cnst(u,vec3(-1.467095,0.882165,-1.054229))))))))*vec3(0.400,0.798,0.045);
+	v=cmp(v-vec3(16.),cmp(v+vec3(16.),vec3(0.),v),vec3(0.));
+	float h=v.z*6.2831853;
+	float x=v.y*cos(h)/3.,y=v.y*sin(h)/1.73205080757;
+	v=mod(abs(vec3(v.x+x+y,v.x-x-x,v.x+x-y))/2.,2.);
+	v=cmp(v-1.,v,2.-v);v=cmp(v,vec3(0.),pow(v,vec3(1.0892)));
+	float gr=(v.x+v.y+v.z)/3.,gm=1.1781;
+	v=cmp(v-vec3(gr),pow(v/gr,vec3(gm))*gr,1.-pow((vec3(1.)-v)/(1.-gr),vec3(gm))*(1.-gr));
+	vec3 p1=cmp(v-vec3(v.g,v.b,v.r),vec3(0.),vec3(4.,2.,1.));x=p1.x+p1.y+p1.z;
+	vec3 p2=(x==6.)?vec3(v.g-v.b,v.b,v.r):(x==2.)?vec3(v.g-v.r,v.b,v.g):
+		(x==3.)?vec3(v.b-v.r,v.r,v.g):(x==1.)?vec3(v.b-v.g,v.r,v.b):
+		(x==5.)?vec3(v.r-v.g,v.g,v.b):vec3(v.r-v.b,v.g,v.r);
+	p2.x=p2.x/(p2.z-p2.y);
+	h=mod((x==6.)?mix(0.110,0.056,p2.x):(x==2.)?mix(0.056,0.039,p2.x):(x==3.)?mix(0.039,0.582,p2.x):
+		(x==1.)?mix(0.582,0.479,p2.x):(x==5.)?mix(0.479,0.907,p2.x):mix(0.907,0.110,p2.x),1.);
+	h=((h<0.083378)?0.:(h<0.455900)?h*0.894801-0.074607:(h<0.794424)?h*0.984669-0.115578:
+		(h<0.849833)?h*1.503976-0.528128:h*0.554936+0.278397)*6.;
+	x=mod(h,1.);p1=vec3(p2.y,p2.z-x*(p2.z-p2.y),p2.z-(1.-x)*(p2.z-p2.y));
+	v=(p2.z==p2.y)?vec3(p2.z):
+		(h<1.)?vec3(p2.z,p1.z,p1.x):(h<2.)?vec3(p1.y,p2.z,p1.x):
+		(h<3.)?vec3(p1.x,p2.z,p1.z):(h<4.)?vec3(p1.x,p1.y,p2.z):
+		(h<5.)?vec3(p1.z,p1.x,p2.z):vec3(p2.z,p1.x,p1.y);
+	return v;
+}
+void main(void){
+	float th=T*6.2831853;
+	float t=sin(th)*1.192719+0.074932;
+	float u=(1.-cos(th))/2.*1.192719+0.074932;
+	vec2 p=((size.x>size.y)?vec2(pCoord.x*size.x/size.y,pCoord.y):vec2(pCoord.x,pCoord.y*size.y/size.x));
+	gl_FragColor=vec4(fn(p,t,u),1.);
+}
+</script>
+<script id="fs12" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec2 size;
+uniform float T;
+varying vec2 pCoord;
+vec3 cmp(vec3 a,vec3 b,vec3 c){
+	return vec3((a.x<0.)?b.x:c.x,(a.y<0.)?b.y:c.y,(a.z<0.)?b.z:c.z);}
+vec3 c2p(vec3 a){
+	return vec3(length(a),atan(a.y,a.x)/3.1415927,atan(a.z,length(a.xy))/3.1415927);}
+vec3 logA(vec3 a){return cmp(-a,log(a),vec3(0.));}
+vec3 myMin(vec3 a,vec3 b){return (a.x<b.x)?a:b;}
+vec3 cnst(float u,vec3 c){return c+c*vec3(u);}
+vec3 power(vec3 a, vec3 b){
+	return cmp(-a,cmp(-b,pow(a,b),cmp(-a,vec3(1.),vec3(0.))),vec3(0.));}
+vec3 divide(vec3 a, vec3 b){
+	return a/cmp(b,b,cmp(-b,b,vec3(1.)));}
+vec3 rotate(vec3 a,vec3 b){
+	b=(mod(b+1.,2.)-1.)*3.1415927;
+	vec3 s=sin(b),c=cos(b);
+	return vec3(dot(vec3(c.x*c.z+s.x*s.y*s.z,c.x*s.y*s.z-s.x*c.z,c.y*s.z),a),
+		dot(vec3(s.x*c.y,c.x*c.y,-s.y),a),
+		dot(vec3(c.x*s.z+s.x*s.y*c.z,c.y*c.z-s.x*s.z,c.y*c.z),a));}
+vec3 hypot(vec3 a,vec3 b){return sqrt(a*a+b*b);}
+vec3 p2c(vec3 a){
+	return vec3(cos(a.z*3.1415927)*cos(a.y*3.1415927),
+		cos(a.z*3.1415927)*sin(a.y*3.1415927),sin(a.z*3.1415927))*a.x;}
+vec3 sqrtA(vec3 a){return cmp(a,-sqrt(-a),sqrt(a));}
+vec3 myMax(vec3 a,vec3 b){return (a.x>b.x)?a:b;}
+vec3 fn(vec2 p,float t,float u){
+	p=p*vec2(0.595,0.900)+vec2(1.016,0.469);
+	vec3 v=(c2p((abs(logA(abs(myMin(c2p((cnst(u,vec3(1.955562,1.736565,-0.119965)))-(power(abs(divide(rotate(rotate(hypot(vec3(p.x,t,p.y),myMin(abs(vec3(p.y,t,p.x)),power(abs(p2c(abs(vec3(p.y,p.x,t)))),abs(cnst(u,vec3(1.643181,0.751665,-1.122219)))))),vec3(p.x,p.y,t)),vec3(p.y,t,p.x)),(cnst(u,vec3(1.955562,1.736565,-0.119965)))-(myMin(divide((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(cnst(u,vec3(1.845742,1.710555,0.780517)))),sin((vec3(t,p.x,p.y))*3.1415927)),p2c(vec3(p.y,p.x,t)))))),abs(p2c(vec3(p.y,t,p.x)))))),p2c(-(divide(logA(abs(hypot(myMax(cos((vec3(p.x,p.y,t))*3.1415927),(abs(logA(abs(sin((hypot((vec3(p.y,t,p.x))-(myMin(divide((vec3(t,p.y,p.x))*(sqrtA(sin((hypot((cnst(u,vec3(1.845742,1.710555,0.780517)))*(abs(cnst(u,vec3(0.599938,1.039770,-1.971348)))),c2p(cnst(u,vec3(-1.467095,0.882165,-1.054229)))))*3.1415927))),sin((vec3(p.y,p.x,t))*3.1415927)),vec3(p.x,t,p.y))),sin((vec3(p.x,p.y,t))*3.1415927)))*3.1415927)))))*(rotate(logA(abs(vec3(p.y,p.x,t))),(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.y,t,p.x))))/2.)),logA(abs(rotate(c2p(exp(cnst(u,vec3(-0.929638,-1.584967,0.847705)))),cnst(u,vec3(1.950307,0.065199,0.799913)))))),logA(abs(rotate(c2p(exp(vec3(p.y,t,p.x))),cnst(u,vec3(1.950307,0.065199,0.799913)))))))))+(hypot(abs((vec3(p.x,p.y,t))+(vec3(p.y,p.x,t))),vec3(t,p.x,p.y)))))),cnst(u,vec3(0.817616,0.758660,-1.700391))))),cnst(u,vec3(0.876495,0.383847,-0.397954))))))))))*(rotate(vec3(p.y,p.x,t),(abs(power(abs((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(sin(((vec3(t,p.x,p.y))-(cnst(u,vec3(-0.976102,1.916044,-1.123562))))*3.1415927)))),abs(exp(sqrtA(p2c(vec3(p.y,t,p.x))))))))+((divide(logA(abs(vec3(t,p.y,p.x))),cnst(u,vec3(0.613423,-0.727868,1.108056))))-(cnst(u,vec3(-1.467095,0.882165,-1.054229))))))))*vec3(1.245,1.773,0.065);
+	v=cmp(v-vec3(16.),cmp(v+vec3(16.),vec3(0.),v),vec3(0.));
+	float h=v.z*6.2831853;
+	float x=v.y*cos(h)/3.,y=v.y*sin(h)/1.73205080757;
+	v=mod(abs(vec3(v.x+x+y,v.x-x-x,v.x+x-y))/2.,2.);
+	v=cmp(v-1.,v,2.-v);v=cmp(v,vec3(0.),pow(v,vec3(1.0079)));
+	float gr=(v.x+v.y+v.z)/3.,gm=0.9763;
+	v=cmp(v-vec3(gr),pow(v/gr,vec3(gm))*gr,1.-pow((vec3(1.)-v)/(1.-gr),vec3(gm))*(1.-gr));
+	vec3 p1=cmp(v-vec3(v.g,v.b,v.r),vec3(0.),vec3(4.,2.,1.));x=p1.x+p1.y+p1.z;
+	vec3 p2=(x==6.)?vec3(v.g-v.b,v.b,v.r):(x==2.)?vec3(v.g-v.r,v.b,v.g):
+		(x==3.)?vec3(v.b-v.r,v.r,v.g):(x==1.)?vec3(v.b-v.g,v.r,v.b):
+		(x==5.)?vec3(v.r-v.g,v.g,v.b):vec3(v.r-v.b,v.g,v.r);
+	p2.x=p2.x/(p2.z-p2.y);
+	h=mod((x==6.)?mix(0.028,0.482,p2.x):(x==2.)?mix(0.482,0.817,p2.x):(x==3.)?mix(0.817,0.231,p2.x):
+		(x==1.)?mix(0.231,0.168,p2.x):(x==5.)?mix(0.168,0.859,p2.x):mix(0.859,0.028,p2.x),1.);
+	h=((h<0.083378)?0.:(h<0.455900)?h*0.894801-0.074607:(h<0.794424)?h*0.984669-0.115578:
+		(h<0.849833)?h*1.503976-0.528128:h*0.554936+0.278397)*6.;
+	x=mod(h,1.);p1=vec3(p2.y,p2.z-x*(p2.z-p2.y),p2.z-(1.-x)*(p2.z-p2.y));
+	v=(p2.z==p2.y)?vec3(p2.z):
+		(h<1.)?vec3(p2.z,p1.z,p1.x):(h<2.)?vec3(p1.y,p2.z,p1.x):
+		(h<3.)?vec3(p1.x,p2.z,p1.z):(h<4.)?vec3(p1.x,p1.y,p2.z):
+		(h<5.)?vec3(p1.z,p1.x,p2.z):vec3(p2.z,p1.x,p1.y);
+	return v;
+}
+void main(void){
+	float th=T*6.2831853;
+	float t=sin(th)*0.891116+-0.021655;
+	float u=(1.-cos(th))/2.*0.891116+-0.021655;
+	vec2 p=((size.x>size.y)?vec2(pCoord.x*size.x/size.y,pCoord.y):vec2(pCoord.x,pCoord.y*size.y/size.x));
+	gl_FragColor=vec4(fn(p,t,u),1.);
+}
+</script>
+<script id="fs13" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec2 size;
+uniform float T;
+varying vec2 pCoord;
+vec3 cmp(vec3 a,vec3 b,vec3 c){
+	return vec3((a.x<0.)?b.x:c.x,(a.y<0.)?b.y:c.y,(a.z<0.)?b.z:c.z);}
+vec3 c2p(vec3 a){
+	return vec3(length(a),atan(a.y,a.x)/3.1415927,atan(a.z,length(a.xy))/3.1415927);}
+vec3 logA(vec3 a){return cmp(-a,log(a),vec3(0.));}
+vec3 myMin(vec3 a,vec3 b){return (a.x<b.x)?a:b;}
+vec3 cnst(float u,vec3 c){return c+c*vec3(u);}
+vec3 power(vec3 a, vec3 b){
+	return cmp(-a,cmp(-b,pow(a,b),cmp(-a,vec3(1.),vec3(0.))),vec3(0.));}
+vec3 divide(vec3 a, vec3 b){
+	return a/cmp(b,b,cmp(-b,b,vec3(1.)));}
+vec3 rotate(vec3 a,vec3 b){
+	b=(mod(b+1.,2.)-1.)*3.1415927;
+	vec3 s=sin(b),c=cos(b);
+	return vec3(dot(vec3(c.x*c.z+s.x*s.y*s.z,c.x*s.y*s.z-s.x*c.z,c.y*s.z),a),
+		dot(vec3(s.x*c.y,c.x*c.y,-s.y),a),
+		dot(vec3(c.x*s.z+s.x*s.y*c.z,c.y*c.z-s.x*s.z,c.y*c.z),a));}
+vec3 hypot(vec3 a,vec3 b){return sqrt(a*a+b*b);}
+vec3 p2c(vec3 a){
+	return vec3(cos(a.z*3.1415927)*cos(a.y*3.1415927),
+		cos(a.z*3.1415927)*sin(a.y*3.1415927),sin(a.z*3.1415927))*a.x;}
+vec3 sqrtA(vec3 a){return cmp(a,-sqrt(-a),sqrt(a));}
+vec3 myMax(vec3 a,vec3 b){return (a.x>b.x)?a:b;}
+vec3 fn(vec2 p,float t,float u){
+	p=p*vec2(0.436,1.226)+vec2(0.561,0.701);
+	vec3 v=(c2p((abs(logA(abs(myMin(c2p((cnst(u,vec3(1.955562,1.736565,-0.119965)))-(power(abs(divide(rotate(rotate(hypot(vec3(p.x,t,p.y),myMin(abs(vec3(p.y,t,p.x)),power(abs(p2c(abs(vec3(p.y,p.x,t)))),abs(cnst(u,vec3(1.643181,0.751665,-1.122219)))))),vec3(p.x,p.y,t)),vec3(p.y,t,p.x)),(cnst(u,vec3(1.955562,1.736565,-0.119965)))-(myMin(divide((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(cnst(u,vec3(1.845742,1.710555,0.780517)))),sin((vec3(t,p.x,p.y))*3.1415927)),p2c(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(power(abs(cnst(u,vec3(1.639387,0.961843,0.626680))),abs(vec3(p.x,t,p.y)))))/2.)),-(cnst(u,vec3(-0.073542,-1.735372,1.927805)))),logA(abs(rotate(c2p(myMax(vec3(p.x,t,p.y),rotate(cos((vec3(p.y,p.x,t))*3.1415927),vec3(t,p.y,p.x)))),cnst(u,vec3(-1.709003,1.218676,-0.887567))))))))))))),abs(p2c(vec3(p.y,t,p.x)))))),p2c(-(divide(logA(abs(hypot(myMax(cos((vec3(p.x,p.y,t))*3.1415927),(abs(logA(abs(sin((hypot((vec3(p.y,t,p.x))-(myMin(divide((vec3(t,p.y,p.x))*(sqrtA(sin((hypot((cnst(u,vec3(1.845742,1.710555,0.780517)))*(abs(cnst(u,vec3(0.599938,1.039770,-1.971348)))),vec3(t,p.y,p.x)))*3.1415927))),sin((vec3(p.y,p.x,t))*3.1415927)),vec3(p.x,t,p.y))),sin((vec3(p.x,p.y,t))*3.1415927)))*3.1415927)))))*(rotate(logA(abs(vec3(p.y,p.x,t))),(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.y,t,p.x))))/2.)),logA(abs(rotate(c2p(exp(cnst(u,vec3(-0.929638,-1.584967,0.847705)))),cnst(u,vec3(1.950307,0.065199,0.799913)))))),logA(abs(rotate(c2p(exp(vec3(p.y,t,p.x))),cnst(u,vec3(1.950307,0.065199,0.799913)))))))))+(hypot(abs((vec3(p.x,p.y,t))+(vec3(p.y,p.x,t))),vec3(t,p.x,p.y)))))),cnst(u,vec3(0.817616,0.758660,-1.700391))))),cnst(u,vec3(0.876495,0.383847,-0.397954))))))))))*(rotate(vec3(p.y,p.x,t),(abs(power(abs((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(sin(((vec3(t,p.x,p.y))-(cnst(u,vec3(-0.976102,1.916044,-1.123562))))*3.1415927)))),abs(exp(sqrtA(p2c(vec3(p.y,t,p.x))))))))+((divide(logA(abs(vec3(t,p.y,p.x))),cnst(u,vec3(0.613423,-0.727868,1.108056))))-(cnst(u,vec3(-1.467095,0.882165,-1.054229))))))))*vec3(0.514,1.536,0.123);
+	v=cmp(v-vec3(16.),cmp(v+vec3(16.),vec3(0.),v),vec3(0.));
+	float h=v.z*6.2831853;
+	float x=v.y*cos(h)/3.,y=v.y*sin(h)/1.73205080757;
+	v=mod(abs(vec3(v.x+x+y,v.x-x-x,v.x+x-y))/2.,2.);
+	v=cmp(v-1.,v,2.-v);v=cmp(v,vec3(0.),pow(v,vec3(0.8476)));
+	float gr=(v.x+v.y+v.z)/3.,gm=0.8544;
+	v=cmp(v-vec3(gr),pow(v/gr,vec3(gm))*gr,1.-pow((vec3(1.)-v)/(1.-gr),vec3(gm))*(1.-gr));
+	vec3 p1=cmp(v-vec3(v.g,v.b,v.r),vec3(0.),vec3(4.,2.,1.));x=p1.x+p1.y+p1.z;
+	vec3 p2=(x==6.)?vec3(v.g-v.b,v.b,v.r):(x==2.)?vec3(v.g-v.r,v.b,v.g):
+		(x==3.)?vec3(v.b-v.r,v.r,v.g):(x==1.)?vec3(v.b-v.g,v.r,v.b):
+		(x==5.)?vec3(v.r-v.g,v.g,v.b):vec3(v.r-v.b,v.g,v.r);
+	p2.x=p2.x/(p2.z-p2.y);
+	h=mod((x==6.)?mix(0.040,0.417,p2.x):(x==2.)?mix(0.417,0.708,p2.x):(x==3.)?mix(0.708,0.904,p2.x):
+		(x==1.)?mix(0.904,0.291,p2.x):(x==5.)?mix(0.291,0.661,p2.x):mix(0.661,0.040,p2.x),1.);
+	h=((h<0.083378)?0.:(h<0.455900)?h*0.894801-0.074607:(h<0.794424)?h*0.984669-0.115578:
+		(h<0.849833)?h*1.503976-0.528128:h*0.554936+0.278397)*6.;
+	x=mod(h,1.);p1=vec3(p2.y,p2.z-x*(p2.z-p2.y),p2.z-(1.-x)*(p2.z-p2.y));
+	v=(p2.z==p2.y)?vec3(p2.z):
+		(h<1.)?vec3(p2.z,p1.z,p1.x):(h<2.)?vec3(p1.y,p2.z,p1.x):
+		(h<3.)?vec3(p1.x,p2.z,p1.z):(h<4.)?vec3(p1.x,p1.y,p2.z):
+		(h<5.)?vec3(p1.z,p1.x,p2.z):vec3(p2.z,p1.x,p1.y);
+	return v;
+}
+void main(void){
+	float th=T*6.2831853;
+	float t=sin(th)*0.373904+-0.169740;
+	float u=(1.-cos(th))/2.*0.373904+-0.169740;
+	vec2 p=((size.x>size.y)?vec2(pCoord.x*size.x/size.y,pCoord.y):vec2(pCoord.x,pCoord.y*size.y/size.x));
+	gl_FragColor=vec4(fn(p,t,u),1.);
+}
+</script>
+<script id="fs14" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec2 size;
+uniform float T;
+varying vec2 pCoord;
+vec3 cmp(vec3 a,vec3 b,vec3 c){
+	return vec3((a.x<0.)?b.x:c.x,(a.y<0.)?b.y:c.y,(a.z<0.)?b.z:c.z);}
+vec3 c2p(vec3 a){
+	return vec3(length(a),atan(a.y,a.x)/3.1415927,atan(a.z,length(a.xy))/3.1415927);}
+vec3 logA(vec3 a){return cmp(-a,log(a),vec3(0.));}
+vec3 myMin(vec3 a,vec3 b){return (a.x<b.x)?a:b;}
+vec3 cnst(float u,vec3 c){return c+c*vec3(u);}
+vec3 power(vec3 a, vec3 b){
+	return cmp(-a,cmp(-b,pow(a,b),cmp(-a,vec3(1.),vec3(0.))),vec3(0.));}
+vec3 divide(vec3 a, vec3 b){
+	return a/cmp(b,b,cmp(-b,b,vec3(1.)));}
+vec3 rotate(vec3 a,vec3 b){
+	b=(mod(b+1.,2.)-1.)*3.1415927;
+	vec3 s=sin(b),c=cos(b);
+	return vec3(dot(vec3(c.x*c.z+s.x*s.y*s.z,c.x*s.y*s.z-s.x*c.z,c.y*s.z),a),
+		dot(vec3(s.x*c.y,c.x*c.y,-s.y),a),
+		dot(vec3(c.x*s.z+s.x*s.y*c.z,c.y*c.z-s.x*s.z,c.y*c.z),a));}
+vec3 hypot(vec3 a,vec3 b){return sqrt(a*a+b*b);}
+vec3 p2c(vec3 a){
+	return vec3(cos(a.z*3.1415927)*cos(a.y*3.1415927),
+		cos(a.z*3.1415927)*sin(a.y*3.1415927),sin(a.z*3.1415927))*a.x;}
+vec3 sqrtA(vec3 a){return cmp(a,-sqrt(-a),sqrt(a));}
+vec3 myMax(vec3 a,vec3 b){return (a.x>b.x)?a:b;}
+vec3 fn(vec2 p,float t,float u){
+	p=p*vec2(0.622,0.709)+vec2(0.979,0.030);
+	vec3 v=(c2p((abs(logA(abs(myMin(c2p((cnst(u,vec3(1.955562,1.736565,-0.119965)))-(power(abs(divide(rotate(rotate(hypot(vec3(p.x,t,p.y),myMin(abs(vec3(p.y,t,p.x)),power(abs(p2c(abs(vec3(p.y,p.x,t)))),abs(cnst(u,vec3(1.643181,0.751665,-1.122219)))))),vec3(p.x,p.y,t)),vec3(p.y,t,p.x)),(cnst(u,vec3(1.955562,1.736565,-0.119965)))-(myMin(divide((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(cnst(u,vec3(1.845742,1.710555,0.780517)))),sin((vec3(t,p.x,p.y))*3.1415927)),p2c(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(power(abs(cnst(u,vec3(1.639387,0.961843,0.626680))),abs(vec3(p.x,t,p.y)))))/2.)),-(cnst(u,vec3(-0.073542,-1.735372,1.927805)))),logA(abs(rotate(c2p(myMax(vec3(p.x,t,p.y),rotate(cos((vec3(p.y,p.x,t))*3.1415927),vec3(t,p.y,p.x)))),cnst(u,vec3(-1.709003,1.218676,-0.887567))))))))))))),abs(p2c(vec3(p.y,t,p.x)))))),p2c(-(divide(logA(abs(hypot(myMax(cos((vec3(p.x,p.y,t))*3.1415927),(abs(logA(abs(sin((hypot((vec3(p.y,t,p.x))-(myMin(divide((vec3(t,p.y,p.x))*(sqrtA(sin((hypot((cnst(u,vec3(1.845742,1.710555,0.780517)))*(abs(cnst(u,vec3(0.599938,1.039770,-1.971348)))),c2p(cnst(u,vec3(-1.467095,0.882165,-1.054229)))))*3.1415927))),sin((vec3(p.y,p.x,t))*3.1415927)),vec3(p.x,t,p.y))),sin((vec3(p.x,p.y,t))*3.1415927)))*3.1415927)))))*(rotate(cnst(u,vec3(-0.885613,1.158027,-1.517889)),(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.y,t,p.x))))/2.)),logA(abs(rotate(c2p(exp(cnst(u,vec3(-0.929638,-1.584967,0.847705)))),cnst(u,vec3(1.950307,0.065199,0.799913)))))),logA(abs(rotate(c2p(exp(vec3(p.y,t,p.x))),cnst(u,vec3(1.950307,0.065199,0.799913)))))))))+(hypot(abs((vec3(p.x,p.y,t))+(vec3(p.y,p.x,t))),vec3(t,p.x,p.y)))))),cnst(u,vec3(0.817616,0.758660,-1.700391))))),cnst(u,vec3(0.876495,0.383847,-0.397954))))))))))*(rotate(vec3(p.y,p.x,t),(abs(power(abs((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(sin(((vec3(t,p.x,p.y))-(cnst(u,vec3(-0.976102,1.916044,-1.123562))))*3.1415927)))),abs(exp(sqrtA(p2c(vec3(p.y,t,p.x))))))))+((divide(logA(abs(vec3(t,p.y,p.x))),cnst(u,vec3(0.613423,-0.727868,1.108056))))-(cnst(u,vec3(-1.467095,0.882165,-1.054229))))))))*vec3(0.352,1.856,0.082);
+	v=cmp(v-vec3(16.),cmp(v+vec3(16.),vec3(0.),v),vec3(0.));
+	float h=v.z*6.2831853;
+	float x=v.y*cos(h)/3.,y=v.y*sin(h)/1.73205080757;
+	v=mod(abs(vec3(v.x+x+y,v.x-x-x,v.x+x-y))/2.,2.);
+	v=cmp(v-1.,v,2.-v);v=cmp(v,vec3(0.),pow(v,vec3(0.9807)));
+	float gr=(v.x+v.y+v.z)/3.,gm=1.0655;
+	v=cmp(v-vec3(gr),pow(v/gr,vec3(gm))*gr,1.-pow((vec3(1.)-v)/(1.-gr),vec3(gm))*(1.-gr));
+	vec3 p1=cmp(v-vec3(v.g,v.b,v.r),vec3(0.),vec3(4.,2.,1.));x=p1.x+p1.y+p1.z;
+	vec3 p2=(x==6.)?vec3(v.g-v.b,v.b,v.r):(x==2.)?vec3(v.g-v.r,v.b,v.g):
+		(x==3.)?vec3(v.b-v.r,v.r,v.g):(x==1.)?vec3(v.b-v.g,v.r,v.b):
+		(x==5.)?vec3(v.r-v.g,v.g,v.b):vec3(v.r-v.b,v.g,v.r);
+	p2.x=p2.x/(p2.z-p2.y);
+	h=mod((x==6.)?mix(0.179,0.005,p2.x):(x==2.)?mix(0.005,0.827,p2.x):(x==3.)?mix(0.827,0.183,p2.x):
+		(x==1.)?mix(0.183,0.839,p2.x):(x==5.)?mix(0.839,0.573,p2.x):mix(0.573,0.179,p2.x),1.);
+	h=((h<0.083378)?0.:(h<0.455900)?h*0.894801-0.074607:(h<0.794424)?h*0.984669-0.115578:
+		(h<0.849833)?h*1.503976-0.528128:h*0.554936+0.278397)*6.;
+	x=mod(h,1.);p1=vec3(p2.y,p2.z-x*(p2.z-p2.y),p2.z-(1.-x)*(p2.z-p2.y));
+	v=(p2.z==p2.y)?vec3(p2.z):
+		(h<1.)?vec3(p2.z,p1.z,p1.x):(h<2.)?vec3(p1.y,p2.z,p1.x):
+		(h<3.)?vec3(p1.x,p2.z,p1.z):(h<4.)?vec3(p1.x,p1.y,p2.z):
+		(h<5.)?vec3(p1.z,p1.x,p2.z):vec3(p2.z,p1.x,p1.y);
+	return v;
+}
+void main(void){
+	float th=T*6.2831853;
+	float t=sin(th)*1.003939+-0.306417;
+	float u=(1.-cos(th))/2.*1.003939+-0.306417;
+	vec2 p=((size.x>size.y)?vec2(pCoord.x*size.x/size.y,pCoord.y):vec2(pCoord.x,pCoord.y*size.y/size.x));
+	gl_FragColor=vec4(fn(p,t,u),1.);
+}
+</script>
+<script id="fs15" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec2 size;
+uniform float T;
+varying vec2 pCoord;
+vec3 cmp(vec3 a,vec3 b,vec3 c){
+	return vec3((a.x<0.)?b.x:c.x,(a.y<0.)?b.y:c.y,(a.z<0.)?b.z:c.z);}
+vec3 c2p(vec3 a){
+	return vec3(length(a),atan(a.y,a.x)/3.1415927,atan(a.z,length(a.xy))/3.1415927);}
+vec3 logA(vec3 a){return cmp(-a,log(a),vec3(0.));}
+vec3 myMin(vec3 a,vec3 b){return (a.x<b.x)?a:b;}
+vec3 cnst(float u,vec3 c){return c+c*vec3(u);}
+vec3 power(vec3 a, vec3 b){
+	return cmp(-a,cmp(-b,pow(a,b),cmp(-a,vec3(1.),vec3(0.))),vec3(0.));}
+vec3 divide(vec3 a, vec3 b){
+	return a/cmp(b,b,cmp(-b,b,vec3(1.)));}
+vec3 rotate(vec3 a,vec3 b){
+	b=(mod(b+1.,2.)-1.)*3.1415927;
+	vec3 s=sin(b),c=cos(b);
+	return vec3(dot(vec3(c.x*c.z+s.x*s.y*s.z,c.x*s.y*s.z-s.x*c.z,c.y*s.z),a),
+		dot(vec3(s.x*c.y,c.x*c.y,-s.y),a),
+		dot(vec3(c.x*s.z+s.x*s.y*c.z,c.y*c.z-s.x*s.z,c.y*c.z),a));}
+vec3 hypot(vec3 a,vec3 b){return sqrt(a*a+b*b);}
+vec3 p2c(vec3 a){
+	return vec3(cos(a.z*3.1415927)*cos(a.y*3.1415927),
+		cos(a.z*3.1415927)*sin(a.y*3.1415927),sin(a.z*3.1415927))*a.x;}
+vec3 sqrtA(vec3 a){return cmp(a,-sqrt(-a),sqrt(a));}
+vec3 myMax(vec3 a,vec3 b){return (a.x>b.x)?a:b;}
+vec3 fn(vec2 p,float t,float u){
+	p=p*vec2(0.493,0.260)+vec2(0.683,-0.009);
+	vec3 v=(c2p((abs(logA(abs(myMin(c2p((cnst(u,vec3(1.955562,1.736565,-0.119965)))-(power(abs(divide(rotate(rotate(hypot(vec3(p.x,t,p.y),myMin(abs(vec3(p.y,t,p.x)),power(abs(p2c(abs(vec3(p.y,p.x,t)))),abs(cnst(u,vec3(1.643181,0.751665,-1.122219)))))),vec3(p.x,p.y,t)),vec3(p.y,t,p.x)),(cnst(u,vec3(1.955562,1.736565,-0.119965)))-(myMin(divide((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(cnst(u,vec3(1.845742,1.710555,0.780517)))),sin((vec3(t,p.x,p.y))*3.1415927)),p2c(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(power(abs(cnst(u,vec3(1.639387,0.961843,0.626680))),abs(vec3(p.x,t,p.y)))))/2.)),-(cnst(u,vec3(-0.073542,-1.735372,1.927805)))),logA(abs(rotate(c2p(myMax(vec3(p.x,t,p.y),rotate(cos((vec3(p.y,p.x,t))*3.1415927),vec3(t,p.y,p.x)))),cnst(u,vec3(-1.709003,1.218676,-0.887567))))))))))))),abs(power(abs(vec3(p.y,p.x,t)),abs(vec3(p.y,t,p.x))))))),p2c(-(divide(logA(abs(logA(abs(rotate(c2p(myMax(vec3(p.y,t,p.x),rotate(cos((vec3(p.x,p.y,t))*3.1415927),vec3(t,p.x,p.y)))),cnst(u,vec3(-1.709003,1.218676,-0.887567))))))),cnst(u,vec3(0.876495,0.383847,-0.397954))))))))))*(rotate(vec3(p.y,p.x,t),(abs(power(abs((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(sin(((vec3(t,p.x,p.y))-(cnst(u,vec3(-0.976102,1.916044,-1.123562))))*3.1415927)))),abs(exp(sqrtA(p2c(vec3(p.y,t,p.x))))))))+((divide(logA(abs(vec3(t,p.y,p.x))),cnst(u,vec3(0.613423,-0.727868,1.108056))))-(cnst(u,vec3(-1.467095,0.882165,-1.054229))))))))*vec3(0.578,1.983,0.144);
+	v=cmp(v-vec3(16.),cmp(v+vec3(16.),vec3(0.),v),vec3(0.));
+	float h=v.z*6.2831853;
+	float x=v.y*cos(h)/3.,y=v.y*sin(h)/1.73205080757;
+	v=mod(abs(vec3(v.x+x+y,v.x-x-x,v.x+x-y))/2.,2.);
+	v=cmp(v-1.,v,2.-v);v=cmp(v,vec3(0.),pow(v,vec3(1.1008)));
+	float gr=(v.x+v.y+v.z)/3.,gm=1.1831;
+	v=cmp(v-vec3(gr),pow(v/gr,vec3(gm))*gr,1.-pow((vec3(1.)-v)/(1.-gr),vec3(gm))*(1.-gr));
+	vec3 p1=cmp(v-vec3(v.g,v.b,v.r),vec3(0.),vec3(4.,2.,1.));x=p1.x+p1.y+p1.z;
+	vec3 p2=(x==6.)?vec3(v.g-v.b,v.b,v.r):(x==2.)?vec3(v.g-v.r,v.b,v.g):
+		(x==3.)?vec3(v.b-v.r,v.r,v.g):(x==1.)?vec3(v.b-v.g,v.r,v.b):
+		(x==5.)?vec3(v.r-v.g,v.g,v.b):vec3(v.r-v.b,v.g,v.r);
+	p2.x=p2.x/(p2.z-p2.y);
+	h=mod((x==6.)?mix(0.869,0.076,p2.x):(x==2.)?mix(0.076,0.423,p2.x):(x==3.)?mix(0.423,0.033,p2.x):
+		(x==1.)?mix(0.033,0.939,p2.x):(x==5.)?mix(0.939,0.485,p2.x):mix(0.485,0.869,p2.x),1.);
+	h=((h<0.083378)?0.:(h<0.455900)?h*0.894801-0.074607:(h<0.794424)?h*0.984669-0.115578:
+		(h<0.849833)?h*1.503976-0.528128:h*0.554936+0.278397)*6.;
+	x=mod(h,1.);p1=vec3(p2.y,p2.z-x*(p2.z-p2.y),p2.z-(1.-x)*(p2.z-p2.y));
+	v=(p2.z==p2.y)?vec3(p2.z):
+		(h<1.)?vec3(p2.z,p1.z,p1.x):(h<2.)?vec3(p1.y,p2.z,p1.x):
+		(h<3.)?vec3(p1.x,p2.z,p1.z):(h<4.)?vec3(p1.x,p1.y,p2.z):
+		(h<5.)?vec3(p1.z,p1.x,p2.z):vec3(p2.z,p1.x,p1.y);
+	return v;
+}
+void main(void){
+	float th=T*6.2831853;
+	float t=sin(th)*0.762841+-0.440481;
+	float u=(1.-cos(th))/2.*0.762841+-0.440481;
+	vec2 p=((size.x>size.y)?vec2(pCoord.x*size.x/size.y,pCoord.y):vec2(pCoord.x,pCoord.y*size.y/size.x));
+	gl_FragColor=vec4(fn(p,t,u),1.);
+}
+</script>
+<script id="fs16" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec2 size;
+uniform float T;
+varying vec2 pCoord;
+vec3 cmp(vec3 a,vec3 b,vec3 c){
+	return vec3((a.x<0.)?b.x:c.x,(a.y<0.)?b.y:c.y,(a.z<0.)?b.z:c.z);}
+vec3 c2p(vec3 a){
+	return vec3(length(a),atan(a.y,a.x)/3.1415927,atan(a.z,length(a.xy))/3.1415927);}
+vec3 logA(vec3 a){return cmp(-a,log(a),vec3(0.));}
+vec3 myMin(vec3 a,vec3 b){return (a.x<b.x)?a:b;}
+vec3 cnst(float u,vec3 c){return c+c*vec3(u);}
+vec3 power(vec3 a, vec3 b){
+	return cmp(-a,cmp(-b,pow(a,b),cmp(-a,vec3(1.),vec3(0.))),vec3(0.));}
+vec3 divide(vec3 a, vec3 b){
+	return a/cmp(b,b,cmp(-b,b,vec3(1.)));}
+vec3 rotate(vec3 a,vec3 b){
+	b=(mod(b+1.,2.)-1.)*3.1415927;
+	vec3 s=sin(b),c=cos(b);
+	return vec3(dot(vec3(c.x*c.z+s.x*s.y*s.z,c.x*s.y*s.z-s.x*c.z,c.y*s.z),a),
+		dot(vec3(s.x*c.y,c.x*c.y,-s.y),a),
+		dot(vec3(c.x*s.z+s.x*s.y*c.z,c.y*c.z-s.x*s.z,c.y*c.z),a));}
+vec3 hypot(vec3 a,vec3 b){return sqrt(a*a+b*b);}
+vec3 p2c(vec3 a){
+	return vec3(cos(a.z*3.1415927)*cos(a.y*3.1415927),
+		cos(a.z*3.1415927)*sin(a.y*3.1415927),sin(a.z*3.1415927))*a.x;}
+vec3 sqrtA(vec3 a){return cmp(a,-sqrt(-a),sqrt(a));}
+vec3 myMax(vec3 a,vec3 b){return (a.x>b.x)?a:b;}
+vec3 fn(vec2 p,float t,float u){
+	p=p*vec2(0.555,0.821)+vec2(0.823,-0.136);
+	vec3 v=(c2p((abs(logA(abs(myMin(c2p((cnst(u,vec3(1.955562,1.736565,-0.119965)))-(power(abs(divide(rotate(rotate(hypot(vec3(p.x,t,p.y),myMin(abs(vec3(p.y,t,p.x)),power(abs(p2c(abs(vec3(p.y,p.x,t)))),abs(cnst(u,vec3(1.643181,0.751665,-1.122219)))))),vec3(p.x,p.y,t)),vec3(p.y,t,p.x)),(cnst(u,vec3(1.955562,1.736565,-0.119965)))-(myMin(divide((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(cnst(u,vec3(1.845742,1.710555,0.780517)))),sin((vec3(t,p.x,p.y))*3.1415927)),p2c(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(power(abs(cnst(u,vec3(1.639387,0.961843,0.626680))),abs(vec3(p.x,t,p.y)))))/2.)),-(cnst(u,vec3(-0.073542,-1.735372,1.927805)))),logA(abs(rotate(c2p(myMax(vec3(p.x,t,p.y),rotate(cos((vec3(p.y,p.x,t))*3.1415927),vec3(t,p.y,p.x)))),cnst(u,vec3(-1.709003,1.218676,-0.887567))))))))))))),abs(p2c(vec3(p.y,t,p.x)))))),p2c(-(divide(logA(abs(logA(abs(rotate(c2p(myMax(vec3(p.y,t,p.x),rotate(cos((vec3(p.x,p.y,t))*3.1415927),vec3(t,p.x,p.y)))),cnst(u,vec3(-1.709003,1.218676,-0.887567))))))),cnst(u,vec3(0.876495,0.383847,-0.397954))))))))))*(rotate(vec3(p.y,p.x,t),(abs(power(abs((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(sin(((vec3(t,p.x,p.y))-((myMax(((cnst(u,vec3(-0.384739,-0.073075,-0.219808)))+(cnst(u,vec3(-0.979910,0.077555,1.432075))))/2.,cnst(u,vec3(1.513390,0.571868,-0.549898))))*(cnst(u,vec3(-0.976102,1.916044,-1.123562)))))*3.1415927)))),abs(exp(sqrtA(p2c(vec3(p.y,t,p.x))))))))+((divide(logA(abs(vec3(t,p.y,p.x))),cnst(u,vec3(0.613423,-0.727868,1.108056))))-(cnst(u,vec3(-1.467095,0.882165,-1.054229))))))))*vec3(0.311,1.485,0.105);
+	v=cmp(v-vec3(16.),cmp(v+vec3(16.),vec3(0.),v),vec3(0.));
+	float h=v.z*6.2831853;
+	float x=v.y*cos(h)/3.,y=v.y*sin(h)/1.73205080757;
+	v=mod(abs(vec3(v.x+x+y,v.x-x-x,v.x+x-y))/2.,2.);
+	v=cmp(v-1.,v,2.-v);v=cmp(v,vec3(0.),pow(v,vec3(1.1936)));
+	float gr=(v.x+v.y+v.z)/3.,gm=0.8931;
+	v=cmp(v-vec3(gr),pow(v/gr,vec3(gm))*gr,1.-pow((vec3(1.)-v)/(1.-gr),vec3(gm))*(1.-gr));
+	vec3 p1=cmp(v-vec3(v.g,v.b,v.r),vec3(0.),vec3(4.,2.,1.));x=p1.x+p1.y+p1.z;
+	vec3 p2=(x==6.)?vec3(v.g-v.b,v.b,v.r):(x==2.)?vec3(v.g-v.r,v.b,v.g):
+		(x==3.)?vec3(v.b-v.r,v.r,v.g):(x==1.)?vec3(v.b-v.g,v.r,v.b):
+		(x==5.)?vec3(v.r-v.g,v.g,v.b):vec3(v.r-v.b,v.g,v.r);
+	p2.x=p2.x/(p2.z-p2.y);
+	h=mod((x==6.)?mix(0.010,0.134,p2.x):(x==2.)?mix(0.134,0.248,p2.x):(x==3.)?mix(0.248,0.658,p2.x):
+		(x==1.)?mix(0.658,0.961,p2.x):(x==5.)?mix(0.961,0.468,p2.x):mix(0.468,0.010,p2.x),1.);
+	h=((h<0.083378)?0.:(h<0.455900)?h*0.894801-0.074607:(h<0.794424)?h*0.984669-0.115578:
+		(h<0.849833)?h*1.503976-0.528128:h*0.554936+0.278397)*6.;
+	x=mod(h,1.);p1=vec3(p2.y,p2.z-x*(p2.z-p2.y),p2.z-(1.-x)*(p2.z-p2.y));
+	v=(p2.z==p2.y)?vec3(p2.z):
+		(h<1.)?vec3(p2.z,p1.z,p1.x):(h<2.)?vec3(p1.y,p2.z,p1.x):
+		(h<3.)?vec3(p1.x,p2.z,p1.z):(h<4.)?vec3(p1.x,p1.y,p2.z):
+		(h<5.)?vec3(p1.z,p1.x,p2.z):vec3(p2.z,p1.x,p1.y);
+	return v;
+}
+void main(void){
+	float th=T*6.2831853;
+	float t=sin(th)*0.870251+0.288786;
+	float u=(1.-cos(th))/2.*0.870251+0.288786;
+	vec2 p=((size.x>size.y)?vec2(pCoord.x*size.x/size.y,pCoord.y):vec2(pCoord.x,pCoord.y*size.y/size.x));
+	gl_FragColor=vec4(fn(p,t,u),1.);
+}
+</script>
+<script id="fs17" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec2 size;
+uniform float T;
+varying vec2 pCoord;
+vec3 cmp(vec3 a,vec3 b,vec3 c){
+	return vec3((a.x<0.)?b.x:c.x,(a.y<0.)?b.y:c.y,(a.z<0.)?b.z:c.z);}
+vec3 c2p(vec3 a){
+	return vec3(length(a),atan(a.y,a.x)/3.1415927,atan(a.z,length(a.xy))/3.1415927);}
+vec3 logA(vec3 a){return cmp(-a,log(a),vec3(0.));}
+vec3 myMin(vec3 a,vec3 b){return (a.x<b.x)?a:b;}
+vec3 cnst(float u,vec3 c){return c+c*vec3(u);}
+vec3 power(vec3 a, vec3 b){
+	return cmp(-a,cmp(-b,pow(a,b),cmp(-a,vec3(1.),vec3(0.))),vec3(0.));}
+vec3 divide(vec3 a, vec3 b){
+	return a/cmp(b,b,cmp(-b,b,vec3(1.)));}
+vec3 rotate(vec3 a,vec3 b){
+	b=(mod(b+1.,2.)-1.)*3.1415927;
+	vec3 s=sin(b),c=cos(b);
+	return vec3(dot(vec3(c.x*c.z+s.x*s.y*s.z,c.x*s.y*s.z-s.x*c.z,c.y*s.z),a),
+		dot(vec3(s.x*c.y,c.x*c.y,-s.y),a),
+		dot(vec3(c.x*s.z+s.x*s.y*c.z,c.y*c.z-s.x*s.z,c.y*c.z),a));}
+vec3 hypot(vec3 a,vec3 b){return sqrt(a*a+b*b);}
+vec3 p2c(vec3 a){
+	return vec3(cos(a.z*3.1415927)*cos(a.y*3.1415927),
+		cos(a.z*3.1415927)*sin(a.y*3.1415927),sin(a.z*3.1415927))*a.x;}
+vec3 sqrtA(vec3 a){return cmp(a,-sqrt(-a),sqrt(a));}
+vec3 myMax(vec3 a,vec3 b){return (a.x>b.x)?a:b;}
+vec3 fn(vec2 p,float t,float u){
+	p=p*vec2(0.622,0.760)+vec2(0.979,0.032);
+	vec3 v=(c2p((abs(logA(abs(myMin(c2p((cnst(u,vec3(1.955562,1.736565,-0.119965)))-(power(abs(divide(rotate(rotate(hypot(vec3(p.x,t,p.y),myMin(abs(vec3(p.y,t,p.x)),power(abs(p2c(abs(vec3(p.y,p.x,t)))),abs(cnst(u,vec3(1.643181,0.751665,-1.122219)))))),vec3(p.x,p.y,t)),vec3(p.y,t,p.x)),(cnst(u,vec3(1.955562,1.736565,-0.119965)))-(myMin(divide((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(cnst(u,vec3(1.845742,1.710555,0.780517)))),sin((vec3(t,p.x,p.y))*3.1415927)),p2c(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(power(abs(cnst(u,vec3(1.639387,0.961843,0.626680))),abs(vec3(p.x,t,p.y)))))/2.)),-(cnst(u,vec3(-0.073542,-1.735372,1.927805)))),logA(abs(rotate(c2p(myMax(vec3(p.x,t,p.y),rotate(cos((vec3(p.y,p.x,t))*3.1415927),vec3(t,p.y,p.x)))),cnst(u,vec3(-1.709003,1.218676,-0.887567))))))))))))),abs(p2c(vec3(p.y,t,p.x)))))),p2c(-(divide(logA(abs(logA(abs(rotate(c2p(myMax(vec3(p.y,t,p.x),rotate(cos((vec3(p.x,p.y,t))*3.1415927),vec3(t,p.x,p.y)))),cnst(u,vec3(-1.709003,1.218676,-0.887567))))))),cnst(u,vec3(0.876495,0.383847,-0.397954))))))))))*(rotate(vec3(p.y,p.x,t),(abs(power(abs((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(sin(((vec3(t,p.x,p.y))-(cnst(u,vec3(-0.976102,1.916044,-1.123562))))*3.1415927)))),abs(exp(sqrtA(p2c(vec3(p.y,t,p.x))))))))+((divide(logA(abs(vec3(t,p.y,p.x))),cnst(u,vec3(0.613423,-0.727868,1.108056))))-(cnst(u,vec3(-1.467095,0.882165,-1.054229))))))))*vec3(0.352,1.856,0.096);
+	v=cmp(v-vec3(16.),cmp(v+vec3(16.),vec3(0.),v),vec3(0.));
+	float h=v.z*6.2831853;
+	float x=v.y*cos(h)/3.,y=v.y*sin(h)/1.73205080757;
+	v=mod(abs(vec3(v.x+x+y,v.x-x-x,v.x+x-y))/2.,2.);
+	v=cmp(v-1.,v,2.-v);v=cmp(v,vec3(0.),pow(v,vec3(1.2096)));
+	float gr=(v.x+v.y+v.z)/3.,gm=0.8768;
+	v=cmp(v-vec3(gr),pow(v/gr,vec3(gm))*gr,1.-pow((vec3(1.)-v)/(1.-gr),vec3(gm))*(1.-gr));
+	vec3 p1=cmp(v-vec3(v.g,v.b,v.r),vec3(0.),vec3(4.,2.,1.));x=p1.x+p1.y+p1.z;
+	vec3 p2=(x==6.)?vec3(v.g-v.b,v.b,v.r):(x==2.)?vec3(v.g-v.r,v.b,v.g):
+		(x==3.)?vec3(v.b-v.r,v.r,v.g):(x==1.)?vec3(v.b-v.g,v.r,v.b):
+		(x==5.)?vec3(v.r-v.g,v.g,v.b):vec3(v.r-v.b,v.g,v.r);
+	p2.x=p2.x/(p2.z-p2.y);
+	h=mod((x==6.)?mix(0.148,0.141,p2.x):(x==2.)?mix(0.141,0.172,p2.x):(x==3.)?mix(0.172,0.799,p2.x):
+		(x==1.)?mix(0.799,0.839,p2.x):(x==5.)?mix(0.839,0.573,p2.x):mix(0.573,0.148,p2.x),1.);
+	h=((h<0.083378)?0.:(h<0.455900)?h*0.894801-0.074607:(h<0.794424)?h*0.984669-0.115578:
+		(h<0.849833)?h*1.503976-0.528128:h*0.554936+0.278397)*6.;
+	x=mod(h,1.);p1=vec3(p2.y,p2.z-x*(p2.z-p2.y),p2.z-(1.-x)*(p2.z-p2.y));
+	v=(p2.z==p2.y)?vec3(p2.z):
+		(h<1.)?vec3(p2.z,p1.z,p1.x):(h<2.)?vec3(p1.y,p2.z,p1.x):
+		(h<3.)?vec3(p1.x,p2.z,p1.z):(h<4.)?vec3(p1.x,p1.y,p2.z):
+		(h<5.)?vec3(p1.z,p1.x,p2.z):vec3(p2.z,p1.x,p1.y);
+	return v;
+}
+void main(void){
+	float th=T*6.2831853;
+	float t=sin(th)*1.003939+-0.306417;
+	float u=(1.-cos(th))/2.*1.003939+-0.306417;
+	vec2 p=((size.x>size.y)?vec2(pCoord.x*size.x/size.y,pCoord.y):vec2(pCoord.x,pCoord.y*size.y/size.x));
+	gl_FragColor=vec4(fn(p,t,u),1.);
+}
+</script>
+<script id="fs18" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec2 size;
+uniform float T;
+varying vec2 pCoord;
+vec3 cmp(vec3 a,vec3 b,vec3 c){
+	return vec3((a.x<0.)?b.x:c.x,(a.y<0.)?b.y:c.y,(a.z<0.)?b.z:c.z);}
+vec3 c2p(vec3 a){
+	return vec3(length(a),atan(a.y,a.x)/3.1415927,atan(a.z,length(a.xy))/3.1415927);}
+vec3 logA(vec3 a){return cmp(-a,log(a),vec3(0.));}
+vec3 myMin(vec3 a,vec3 b){return (a.x<b.x)?a:b;}
+vec3 cnst(float u,vec3 c){return c+c*vec3(u);}
+vec3 power(vec3 a, vec3 b){
+	return cmp(-a,cmp(-b,pow(a,b),cmp(-a,vec3(1.),vec3(0.))),vec3(0.));}
+vec3 divide(vec3 a, vec3 b){
+	return a/cmp(b,b,cmp(-b,b,vec3(1.)));}
+vec3 rotate(vec3 a,vec3 b){
+	b=(mod(b+1.,2.)-1.)*3.1415927;
+	vec3 s=sin(b),c=cos(b);
+	return vec3(dot(vec3(c.x*c.z+s.x*s.y*s.z,c.x*s.y*s.z-s.x*c.z,c.y*s.z),a),
+		dot(vec3(s.x*c.y,c.x*c.y,-s.y),a),
+		dot(vec3(c.x*s.z+s.x*s.y*c.z,c.y*c.z-s.x*s.z,c.y*c.z),a));}
+vec3 hypot(vec3 a,vec3 b){return sqrt(a*a+b*b);}
+vec3 p2c(vec3 a){
+	return vec3(cos(a.z*3.1415927)*cos(a.y*3.1415927),
+		cos(a.z*3.1415927)*sin(a.y*3.1415927),sin(a.z*3.1415927))*a.x;}
+vec3 sqrtA(vec3 a){return cmp(a,-sqrt(-a),sqrt(a));}
+vec3 myMax(vec3 a,vec3 b){return (a.x>b.x)?a:b;}
+vec3 fn(vec2 p,float t,float u){
+	p=p*vec2(0.755,0.657)+vec2(0.571,-0.275);
+	vec3 v=(c2p((abs(logA(abs(myMin(c2p((cnst(u,vec3(1.955562,1.736565,-0.119965)))-(power(abs(divide(rotate(rotate(hypot(vec3(p.x,t,p.y),myMin(abs(vec3(p.y,t,p.x)),power(abs(p2c(abs(vec3(p.y,p.x,t)))),abs(cnst(u,vec3(1.643181,0.751665,-1.122219)))))),vec3(p.x,p.y,t)),vec3(p.y,t,p.x)),(cnst(u,vec3(1.955562,1.736565,-0.119965)))-(myMin(divide((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(cnst(u,vec3(1.845742,1.710555,0.780517)))),sin((vec3(t,p.x,p.y))*3.1415927)),p2c(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.x,t,p.y))))/2.)),exp(rotate(-(cnst(u,vec3(-0.073542,-1.735372,1.927805))),cnst(u,vec3(1.883485,-0.669459,1.862767))))),logA(abs(rotate(rotate(logA(abs(vec3(p.x,p.y,t))),(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.x,t,p.y))))/2.)),logA(abs(rotate(c2p(exp(cnst(u,vec3(-0.929638,-1.584967,0.847705)))),cnst(u,vec3(1.950307,0.065199,0.799913)))))),logA(abs(rotate(c2p(exp(vec3(p.x,t,p.y))),cnst(u,vec3(1.950307,0.065199,0.799913)))))))))+(hypot(abs((vec3(p.y,p.x,t))+(vec3(p.x,p.y,t))),vec3(t,p.y,p.x)))),cnst(u,vec3(-1.709003,1.218676,-0.887567))))))))))))),abs(p2c(vec3(p.y,t,p.x)))))),p2c(-(divide(logA(abs(hypot(myMax(cos((vec3(p.x,p.y,t))*3.1415927),(hypot(logA(abs(sin((hypot((vec3(p.y,t,p.x))-(myMin(divide(abs(sqrtA(sin((hypot(cnst(u,vec3(1.845742,1.710555,0.780517)),c2p(cnst(u,vec3(-1.467095,0.882165,-1.054229)))))*3.1415927))),sin((vec3(p.y,p.x,t))*3.1415927)),vec3(p.x,t,p.y))),sin((vec3(p.x,p.y,t))*3.1415927)))*3.1415927))),abs(vec3(p.x,p.y,t))))*(rotate(logA(abs(vec3(p.y,p.x,t))),(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.y,t,p.x))))/2.)),logA(abs(rotate(c2p(exp(cnst(u,vec3(-0.929638,-1.584967,0.847705)))),cnst(u,vec3(1.950307,0.065199,0.799913)))))),logA(abs(rotate(c2p(exp(vec3(p.y,t,p.x))),cnst(u,vec3(1.950307,0.065199,0.799913)))))))))+(hypot(abs((vec3(p.x,p.y,t))+(vec3(p.y,p.x,t))),vec3(t,p.x,p.y)))))),cnst(u,vec3(0.817616,0.758660,-1.700391))))),cnst(u,vec3(0.876495,0.383847,-0.397954))))))))))*(rotate(vec3(p.y,p.x,t),(abs(power(abs((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(sin(((vec3(t,p.x,p.y))-(cnst(u,vec3(-0.976102,1.916044,-1.123562))))*3.1415927)))),abs(exp(sqrtA(p2c(vec3(p.y,t,p.x))))))))+((abs(cnst(u,vec3(0.613423,-0.727868,1.108056))))-(cnst(u,vec3(-1.467095,0.882165,-1.054229))))))))*vec3(1.600,0.594,0.091);
+	v=cmp(v-vec3(16.),cmp(v+vec3(16.),vec3(0.),v),vec3(0.));
+	float h=v.z*6.2831853;
+	float x=v.y*cos(h)/3.,y=v.y*sin(h)/1.73205080757;
+	v=mod(abs(vec3(v.x+x+y,v.x-x-x,v.x+x-y))/2.,2.);
+	v=cmp(v-1.,v,2.-v);v=cmp(v,vec3(0.),pow(v,vec3(1.2333)));
+	float gr=(v.x+v.y+v.z)/3.,gm=1.3464;
+	v=cmp(v-vec3(gr),pow(v/gr,vec3(gm))*gr,1.-pow((vec3(1.)-v)/(1.-gr),vec3(gm))*(1.-gr));
+	vec3 p1=cmp(v-vec3(v.g,v.b,v.r),vec3(0.),vec3(4.,2.,1.));x=p1.x+p1.y+p1.z;
+	vec3 p2=(x==6.)?vec3(v.g-v.b,v.b,v.r):(x==2.)?vec3(v.g-v.r,v.b,v.g):
+		(x==3.)?vec3(v.b-v.r,v.r,v.g):(x==1.)?vec3(v.b-v.g,v.r,v.b):
+		(x==5.)?vec3(v.r-v.g,v.g,v.b):vec3(v.r-v.b,v.g,v.r);
+	p2.x=p2.x/(p2.z-p2.y);
+	h=mod((x==6.)?mix(0.241,0.243,p2.x):(x==2.)?mix(0.243,0.329,p2.x):(x==3.)?mix(0.329,0.351,p2.x):
+		(x==1.)?mix(0.351,0.382,p2.x):(x==5.)?mix(0.382,0.067,p2.x):mix(0.067,0.241,p2.x),1.);
+	h=((h<0.083378)?0.:(h<0.455900)?h*0.894801-0.074607:(h<0.794424)?h*0.984669-0.115578:
+		(h<0.849833)?h*1.503976-0.528128:h*0.554936+0.278397)*6.;
+	x=mod(h,1.);p1=vec3(p2.y,p2.z-x*(p2.z-p2.y),p2.z-(1.-x)*(p2.z-p2.y));
+	v=(p2.z==p2.y)?vec3(p2.z):
+		(h<1.)?vec3(p2.z,p1.z,p1.x):(h<2.)?vec3(p1.y,p2.z,p1.x):
+		(h<3.)?vec3(p1.x,p2.z,p1.z):(h<4.)?vec3(p1.x,p1.y,p2.z):
+		(h<5.)?vec3(p1.z,p1.x,p2.z):vec3(p2.z,p1.x,p1.y);
+	return v;
+}
+void main(void){
+	float th=T*6.2831853;
+	float t=sin(th)*0.409460+-0.283983;
+	float u=(1.-cos(th))/2.*0.409460+-0.283983;
+	vec2 p=((size.x>size.y)?vec2(pCoord.x*size.x/size.y,pCoord.y):vec2(pCoord.x,pCoord.y*size.y/size.x));
+	gl_FragColor=vec4(fn(p,t,u),1.);
+}
+</script>
+<script id="fs19" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec2 size;
+uniform float T;
+varying vec2 pCoord;
+vec3 cmp(vec3 a,vec3 b,vec3 c){
+	return vec3((a.x<0.)?b.x:c.x,(a.y<0.)?b.y:c.y,(a.z<0.)?b.z:c.z);}
+vec3 c2p(vec3 a){
+	return vec3(length(a),atan(a.y,a.x)/3.1415927,atan(a.z,length(a.xy))/3.1415927);}
+vec3 logA(vec3 a){return cmp(-a,log(a),vec3(0.));}
+vec3 myMin(vec3 a,vec3 b){return (a.x<b.x)?a:b;}
+vec3 cnst(float u,vec3 c){return c+c*vec3(u);}
+vec3 power(vec3 a, vec3 b){
+	return cmp(-a,cmp(-b,pow(a,b),cmp(-a,vec3(1.),vec3(0.))),vec3(0.));}
+vec3 divide(vec3 a, vec3 b){
+	return a/cmp(b,b,cmp(-b,b,vec3(1.)));}
+vec3 rotate(vec3 a,vec3 b){
+	b=(mod(b+1.,2.)-1.)*3.1415927;
+	vec3 s=sin(b),c=cos(b);
+	return vec3(dot(vec3(c.x*c.z+s.x*s.y*s.z,c.x*s.y*s.z-s.x*c.z,c.y*s.z),a),
+		dot(vec3(s.x*c.y,c.x*c.y,-s.y),a),
+		dot(vec3(c.x*s.z+s.x*s.y*c.z,c.y*c.z-s.x*s.z,c.y*c.z),a));}
+vec3 hypot(vec3 a,vec3 b){return sqrt(a*a+b*b);}
+vec3 p2c(vec3 a){
+	return vec3(cos(a.z*3.1415927)*cos(a.y*3.1415927),
+		cos(a.z*3.1415927)*sin(a.y*3.1415927),sin(a.z*3.1415927))*a.x;}
+vec3 sqrtA(vec3 a){return cmp(a,-sqrt(-a),sqrt(a));}
+vec3 myMax(vec3 a,vec3 b){return (a.x>b.x)?a:b;}
+vec3 fn(vec2 p,float t,float u){
+	p=p*vec2(1.424,0.760)+vec2(1.294,-0.192);
+	vec3 v=(c2p((abs(logA(abs(myMin(c2p((cnst(u,vec3(1.955562,1.736565,-0.119965)))-(power(abs(divide(rotate(rotate(hypot(vec3(p.x,t,p.y),myMin(abs(vec3(p.y,t,p.x)),power(abs(p2c(abs(vec3(p.y,p.x,t)))),abs(cnst(u,vec3(1.643181,0.751665,-1.122219)))))),vec3(p.x,p.y,t)),vec3(p.y,t,p.x)),(cnst(u,vec3(1.955562,1.736565,-0.119965)))-(myMin(divide((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(cnst(u,vec3(1.845742,1.710555,0.780517)))),sin((vec3(t,p.x,p.y))*3.1415927)),p2c(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.x,t,p.y))))/2.)),-(cnst(u,vec3(-0.073542,-1.735372,1.927805)))),logA(abs(rotate(c2p(myMax(vec3(p.x,t,p.y),rotate(cos((vec3(p.y,p.x,t))*3.1415927),vec3(t,p.y,p.x)))),cnst(u,vec3(-1.709003,1.218676,-0.887567))))))))))))),abs(p2c(vec3(p.y,t,p.x)))))),p2c(-(divide(logA(abs(hypot(myMax(cos((vec3(p.x,p.y,t))*3.1415927),(abs(logA(abs(sin((hypot((vec3(p.y,t,p.x))-(myMin(divide((vec3(t,p.y,p.x))*(sqrtA(sin((hypot(cnst(u,vec3(1.845742,1.710555,0.780517)),c2p(cnst(u,vec3(-1.467095,0.882165,-1.054229)))))*3.1415927))),sin((vec3(p.y,p.x,t))*3.1415927)),vec3(p.x,t,p.y))),sin((vec3(p.x,p.y,t))*3.1415927)))*3.1415927)))))*(rotate(logA(abs(vec3(p.y,p.x,t))),(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.y,t,p.x))))/2.)),logA(abs(rotate(c2p(exp(cnst(u,vec3(-0.929638,-1.584967,0.847705)))),cnst(u,vec3(1.950307,0.065199,0.799913)))))),logA(abs(rotate(c2p(exp(vec3(p.y,t,p.x))),cnst(u,vec3(1.950307,0.065199,0.799913)))))))))+(hypot(abs((vec3(p.x,p.y,t))+(vec3(p.y,p.x,t))),vec3(t,p.x,p.y)))))),cnst(u,vec3(0.817616,0.758660,-1.700391))))),cnst(u,vec3(0.876495,0.383847,-0.397954))))))))))*(rotate(vec3(p.y,p.x,t),(abs(power(abs((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(sin(((vec3(t,p.x,p.y))-(cnst(u,vec3(-0.976102,1.916044,-1.123562))))*3.1415927)))),abs(exp(sqrtA(p2c(vec3(p.y,t,p.x))))))))+((abs(cnst(u,vec3(0.613423,-0.727868,1.108056))))-(cnst(u,vec3(-1.467095,0.882165,-1.054229))))))))*vec3(0.644,0.424,0.096);
+	v=cmp(v-vec3(16.),cmp(v+vec3(16.),vec3(0.),v),vec3(0.));
+	float h=v.z*6.2831853;
+	float x=v.y*cos(h)/3.,y=v.y*sin(h)/1.73205080757;
+	v=mod(abs(vec3(v.x+x+y,v.x-x-x,v.x+x-y))/2.,2.);
+	v=cmp(v-1.,v,2.-v);v=cmp(v,vec3(0.),pow(v,vec3(1.2096)));
+	float gr=(v.x+v.y+v.z)/3.,gm=0.8768;
+	v=cmp(v-vec3(gr),pow(v/gr,vec3(gm))*gr,1.-pow((vec3(1.)-v)/(1.-gr),vec3(gm))*(1.-gr));
+	vec3 p1=cmp(v-vec3(v.g,v.b,v.r),vec3(0.),vec3(4.,2.,1.));x=p1.x+p1.y+p1.z;
+	vec3 p2=(x==6.)?vec3(v.g-v.b,v.b,v.r):(x==2.)?vec3(v.g-v.r,v.b,v.g):
+		(x==3.)?vec3(v.b-v.r,v.r,v.g):(x==1.)?vec3(v.b-v.g,v.r,v.b):
+		(x==5.)?vec3(v.r-v.g,v.g,v.b):vec3(v.r-v.b,v.g,v.r);
+	p2.x=p2.x/(p2.z-p2.y);
+	h=mod((x==6.)?mix(0.148,0.141,p2.x):(x==2.)?mix(0.141,0.172,p2.x):(x==3.)?mix(0.172,0.799,p2.x):
+		(x==1.)?mix(0.799,0.686,p2.x):(x==5.)?mix(0.686,0.085,p2.x):mix(0.085,0.148,p2.x),1.);
+	h=((h<0.083378)?0.:(h<0.455900)?h*0.894801-0.074607:(h<0.794424)?h*0.984669-0.115578:
+		(h<0.849833)?h*1.503976-0.528128:h*0.554936+0.278397)*6.;
+	x=mod(h,1.);p1=vec3(p2.y,p2.z-x*(p2.z-p2.y),p2.z-(1.-x)*(p2.z-p2.y));
+	v=(p2.z==p2.y)?vec3(p2.z):
+		(h<1.)?vec3(p2.z,p1.z,p1.x):(h<2.)?vec3(p1.y,p2.z,p1.x):
+		(h<3.)?vec3(p1.x,p2.z,p1.z):(h<4.)?vec3(p1.x,p1.y,p2.z):
+		(h<5.)?vec3(p1.z,p1.x,p2.z):vec3(p2.z,p1.x,p1.y);
+	return v;
+}
+void main(void){
+	float th=T*6.2831853;
+	float t=sin(th)*0.330633+-0.295578;
+	float u=(1.-cos(th))/2.*0.330633+-0.295578;
+	vec2 p=((size.x>size.y)?vec2(pCoord.x*size.x/size.y,pCoord.y):vec2(pCoord.x,pCoord.y*size.y/size.x));
+	gl_FragColor=vec4(fn(p,t,u),1.);
+}
+</script>
+<script id="fs20" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec2 size;
+uniform float T;
+varying vec2 pCoord;
+vec3 cmp(vec3 a,vec3 b,vec3 c){
+	return vec3((a.x<0.)?b.x:c.x,(a.y<0.)?b.y:c.y,(a.z<0.)?b.z:c.z);}
+vec3 c2p(vec3 a){
+	return vec3(length(a),atan(a.y,a.x)/3.1415927,atan(a.z,length(a.xy))/3.1415927);}
+vec3 logA(vec3 a){return cmp(-a,log(a),vec3(0.));}
+vec3 myMin(vec3 a,vec3 b){return (a.x<b.x)?a:b;}
+vec3 cnst(float u,vec3 c){return c+c*vec3(u);}
+vec3 power(vec3 a, vec3 b){
+	return cmp(-a,cmp(-b,pow(a,b),cmp(-a,vec3(1.),vec3(0.))),vec3(0.));}
+vec3 divide(vec3 a, vec3 b){
+	return a/cmp(b,b,cmp(-b,b,vec3(1.)));}
+vec3 rotate(vec3 a,vec3 b){
+	b=(mod(b+1.,2.)-1.)*3.1415927;
+	vec3 s=sin(b),c=cos(b);
+	return vec3(dot(vec3(c.x*c.z+s.x*s.y*s.z,c.x*s.y*s.z-s.x*c.z,c.y*s.z),a),
+		dot(vec3(s.x*c.y,c.x*c.y,-s.y),a),
+		dot(vec3(c.x*s.z+s.x*s.y*c.z,c.y*c.z-s.x*s.z,c.y*c.z),a));}
+vec3 hypot(vec3 a,vec3 b){return sqrt(a*a+b*b);}
+vec3 p2c(vec3 a){
+	return vec3(cos(a.z*3.1415927)*cos(a.y*3.1415927),
+		cos(a.z*3.1415927)*sin(a.y*3.1415927),sin(a.z*3.1415927))*a.x;}
+vec3 sqrtA(vec3 a){return cmp(a,-sqrt(-a),sqrt(a));}
+vec3 myMax(vec3 a,vec3 b){return (a.x>b.x)?a:b;}
+vec3 fn(vec2 p,float t,float u){
+	p=p*vec2(0.680,0.773)+vec2(0.646,-0.244);
+	vec3 v=(c2p((abs(logA(abs(myMin(c2p((cnst(u,vec3(1.955562,1.736565,-0.119965)))-(power(abs(divide(rotate(rotate(hypot(vec3(p.x,t,p.y),myMin(abs(vec3(p.y,t,p.x)),power(abs(p2c(abs(vec3(p.y,p.x,t)))),abs(cnst(u,vec3(1.643181,0.751665,-1.122219)))))),vec3(p.x,p.y,t)),vec3(p.y,t,p.x)),(cnst(u,vec3(1.955562,1.736565,-0.119965)))-(myMin(divide((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(cnst(u,vec3(1.845742,1.710555,0.780517)))),sin((vec3(t,p.x,p.y))*3.1415927)),p2c(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.x,t,p.y))))/2.)),exp(rotate(-(cnst(u,vec3(-0.073542,-1.735372,1.927805))),cnst(u,vec3(1.883485,-0.669459,1.862767))))),logA(abs(rotate(c2p(exp(vec3(p.x,t,p.y))),cnst(u,vec3(-1.709003,1.218676,-0.887567))))))))))))),abs(p2c(vec3(p.y,t,p.x)))))),p2c(-(divide(logA(abs(hypot(myMax(cos((vec3(p.x,p.y,t))*3.1415927),(abs(logA(abs(sin((hypot((vec3(p.y,t,p.x))-(myMin(divide(abs(sqrtA(sin((hypot(cnst(u,vec3(1.845742,1.710555,0.780517)),c2p(cnst(u,vec3(-1.467095,0.882165,-1.054229)))))*3.1415927))),sin((vec3(p.y,p.x,t))*3.1415927)),vec3(p.x,t,p.y))),sin((vec3(p.x,p.y,t))*3.1415927)))*3.1415927)))))*(rotate(logA(abs(vec3(p.y,p.x,t))),(logA(abs(hypot(myMax((cnst(u,vec3(-0.121186,-1.095620,-0.943700)))*(c2p(((cnst(u,vec3(1.404361,-1.602733,1.467660)))+(p2c(vec3(p.y,t,p.x))))/2.)),logA(abs(rotate(c2p(exp(cnst(u,vec3(-0.929638,-1.584967,0.847705)))),cnst(u,vec3(1.950307,0.065199,0.799913)))))),logA(abs(rotate(c2p(exp(vec3(p.y,t,p.x))),cnst(u,vec3(1.950307,0.065199,0.799913)))))))))+(hypot(abs((vec3(p.x,p.y,t))+(vec3(p.y,p.x,t))),vec3(t,p.x,p.y)))))),cnst(u,vec3(0.817616,0.758660,-1.700391))))),cnst(u,vec3(0.876495,0.383847,-0.397954))))))))))*(rotate(vec3(p.y,p.x,t),(abs(power(abs((cnst(u,vec3(-0.690673,1.984097,0.533020)))+(sqrtA(sin(((vec3(t,p.x,p.y))-(cnst(u,vec3(-0.976102,1.916044,-1.123562))))*3.1415927)))),abs(exp(sqrtA(p2c(vec3(p.y,t,p.x))))))))+((abs(cnst(u,vec3(0.613423,-0.727868,1.108056))))-(cnst(u,vec3(-1.467095,0.882165,-1.054229))))))))*vec3(0.532,0.653,0.132);
+	v=cmp(v-vec3(16.),cmp(v+vec3(16.),vec3(0.),v),vec3(0.));
+	float h=v.z*6.2831853;
+	float x=v.y*cos(h)/3.,y=v.y*sin(h)/1.73205080757;
+	v=mod(abs(vec3(v.x+x+y,v.x-x-x,v.x+x-y))/2.,2.);
+	v=cmp(v-1.,v,2.-v);v=cmp(v,vec3(0.),pow(v,vec3(1.2484)));
+	float gr=(v.x+v.y+v.z)/3.,gm=1.1286;
+	v=cmp(v-vec3(gr),pow(v/gr,vec3(gm))*gr,1.-pow((vec3(1.)-v)/(1.-gr),vec3(gm))*(1.-gr));
+	vec3 p1=cmp(v-vec3(v.g,v.b,v.r),vec3(0.),vec3(4.,2.,1.));x=p1.x+p1.y+p1.z;
+	vec3 p2=(x==6.)?vec3(v.g-v.b,v.b,v.r):(x==2.)?vec3(v.g-v.r,v.b,v.g):
+		(x==3.)?vec3(v.b-v.r,v.r,v.g):(x==1.)?vec3(v.b-v.g,v.r,v.b):
+		(x==5.)?vec3(v.r-v.g,v.g,v.b):vec3(v.r-v.b,v.g,v.r);
+	p2.x=p2.x/(p2.z-p2.y);
+	h=mod((x==6.)?mix(0.224,0.183,p2.x):(x==2.)?mix(0.183,0.180,p2.x):(x==3.)?mix(0.180,0.259,p2.x):
+		(x==1.)?mix(0.259,0.400,p2.x):(x==5.)?mix(0.400,0.089,p2.x):mix(0.089,0.224,p2.x),1.);
+	h=((h<0.083378)?0.:(h<0.455900)?h*0.894801-0.074607:(h<0.794424)?h*0.984669-0.115578:
+		(h<0.849833)?h*1.503976-0.528128:h*0.554936+0.278397)*6.;
+	x=mod(h,1.);p1=vec3(p2.y,p2.z-x*(p2.z-p2.y),p2.z-(1.-x)*(p2.z-p2.y));
+	v=(p2.z==p2.y)?vec3(p2.z):
+		(h<1.)?vec3(p2.z,p1.z,p1.x):(h<2.)?vec3(p1.y,p2.z,p1.x):
+		(h<3.)?vec3(p1.x,p2.z,p1.z):(h<4.)?vec3(p1.x,p1.y,p2.z):
+		(h<5.)?vec3(p1.z,p1.x,p2.z):vec3(p2.z,p1.x,p1.y);
+	return v;
+}
+void main(void){
+	float th=T*6.2831853;
+	float t=sin(th)*0.404730+-0.396000;
+	float u=(1.-cos(th))/2.*0.404730+-0.396000;
+	vec2 p=((size.x>size.y)?vec2(pCoord.x*size.x/size.y,pCoord.y):vec2(pCoord.x,pCoord.y*size.y/size.x));
+	gl_FragColor=vec4(fn(p,t,u),1.);
+}
+</script>
 </head>
 <body onload="setup()">
 <canvas width=1280px height=720px></canvas>
-<img src="playButton.svg" onclick="startPlay(this)"
-	style="position:absolute;top:30%;left:40%"/>
-<iframe height="0px" frameborder="0"></iframe>
+<svg onclick="startPlay(this)" style="position:absolute;top:30%;left:40%"
+version="1.1" width="256.0" height="256.0" viewBox="0 0 256 256">
+<path d="M48,240C30.327,240 16,225.673 16,208L16,48C16,30.327 30.327,16 48,16
+L208,16C225.673,16 240,30.327 240,48L240,208C240,225.673 225.673,240 208,240Z"
+fill="#000000" fill-opacity="0.5" stroke="none"></path>
+<path d="M63.500,47.500L63.500,207.500L208,128Z"
+fill="#FEFEFE" fill-opacity="0.8" stroke="none"></path>
+</svg>
 </body>
 </html>
