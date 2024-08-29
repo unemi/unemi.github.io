@@ -20,12 +20,12 @@ function didLoadingComplete(flag) {
 }
 async function preload(postProc) {
 	loadedFlags = 0
-	audio2 = new Audio(codeNumb + ".mp3")
-	audio2.onloadeddata = (e)=>{ didLoadingComplete(1) }
 	loadedHandler = postProc
+	audio2 = new Audio(codeNumb + ".mp3")
+	audio2.oncanplay = (e)=>{ didLoadingComplete(1) }
 	audio2.addEventListener("ended", playNext, {once:true})
 	shader2 = makeShader("fs" + codeNumb, gl.FRAGMENT_SHADER)
-	didLoadingComplete(2)
+	didLoadingComplete(isSmartPhone? 3 : 2)
 }
 function canvasSizeSetup() {
 	gl.viewport(0, 0, canvas.width, canvas.height)
@@ -48,6 +48,7 @@ function adjustCanvasSize(stw, sth) {
 	canvasSizeSetup()
 }
 function playNext() {
+console.log("playNext " + loadedFlags)
 	if (loadedFlags < 3) { loadedHandler = playNext; return }
 	readyToDraw = false
 	if (shader1) { gl.detachShader(program, shader1); gl.deleteShader(shader1) }
@@ -80,6 +81,7 @@ function didWindowResize() {	// for smart phone
 }
 function startStop(start) {
 	if (start) {
+		console.log("start")
 		playBtn.remove()
 		if (audio1) audio1.play(); else playNext()
 	} else {
@@ -128,10 +130,12 @@ function setup() {
 	preload(()=>{ playBtn.hidden = false })
 }
 function startPlay() {
-    if (isSmartPhone) startStop(true)
-    else if (canvas.requestFullScreen) canvas.requestFullScreen()
-    else if (canvas.webkitRequestFullScreen) canvas.webkitRequestFullScreen()
-    else if (canvas.mozRequestFullScreen) canvas.mozRequestFullScreen()
+	if (isSmartPhone) startStop(true)
+	else {
+		if (canvas.requestFullScreen) canvas.requestFullScreen()
+		else if (canvas.webkitRequestFullScreen) canvas.webkitRequestFullScreen()
+		else if (canvas.mozRequestFullScreen) canvas.mozRequestFullScreen()
+		if (!audio1) { audio2.play(); audio2.pause() }
+	}
 	timer = setInterval(drawScene, 1000./60.)
-	if (!audio1) { audio2.play(); audio2.pause() }
 }
