@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8"/>
+<title>SBArt4 Animation on WebGL</title>
+<script src="myScript.js#1" type="text/javascript"></script>
+<script id="vshader" type="x-shader/x-vertex">
+attribute vec4 vPos;
+uniform float xScale;
+varying vec2 pCoord;
+void main(void) {
+	gl_Position = vPos;
+	pCoord = vec2(vPos.x*xScale,vPos.y);
+}
+</script>
+</head>
+<body onload="setup()">
+<canvas width=1280px height=720px></canvas>
+<svg  onclick="startPlay(this)"
+	style="position:absolute;top:30%;left:40%"
+	version="1.1" width="256.0" height="256.0" viewBox="0 0 256 256">
+<path d="M48,240C30.327,240 16,225.673 16,208L16,48C16,30.327 30.327,16 48,16
+L208,16C225.673,16 240,30.327 240,48L240,208C240,225.673 225.673,240 208,240Z"
+fill="#000000" fill-opacity="0.502" stroke="none"></path>
+<path d="M63.500,47.500L63.500,207.500L208,128Z"
+fill="#FEFEFE" fill-opacity="0.798" stroke="none"></path>
+</svg>
+<!-- img src="playButton.svg" onclick="startPlay(this)"
+	style="position:absolute;top:30%;left:40%"/ -->
+<iframe height="0px" frameborder="0"></iframe>
+</body>
+</html>
