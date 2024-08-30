@@ -36,9 +36,11 @@ function canvasSizeSetup() {
 }
 async function drawScene() {
 	if (!readyToDraw) return
+	readyToDraw = false
 	gl.uniform1f(tPos, audio1.currentTime / audio1.duration)
 	gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
 	gl.flush()
+	readyToDraw = true
 }
 function adjustCanvasSize(stw, sth) {
 	canvas.style.width = stw + "px"
@@ -48,7 +50,6 @@ function adjustCanvasSize(stw, sth) {
 	canvasSizeSetup()
 }
 function playNext() {
-console.log("playNext " + loadedFlags)
 	if (loadedFlags < 3) { loadedHandler = playNext; return }
 	readyToDraw = false
 	if (shader1) { gl.detachShader(program, shader1); gl.deleteShader(shader1) }
@@ -81,7 +82,6 @@ function didWindowResize() {	// for smart phone
 }
 function startStop(start) {
 	if (start) {
-		console.log("start")
 		playBtn.remove()
 		if (audio1) audio1.play(); else playNext()
 	} else {
