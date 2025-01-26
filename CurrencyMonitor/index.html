@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
+<meta name="viewport" content="width=device-width"/>
+<style>
+body {font-family:Helvetica;color:#ddd;background:#333}
+#timeStamp {font-size:medium}
+</style>
+<script type="text/javascript" src="A.js"></script>
+<title class="price">Title</title>
+</head>
+<body onload="setup()">
+<h1><span class="price">Title</span> <span id="timeStamp">2025</span></h1>
+<div id="control">
+<label>Currency:
+<select id="symbol" onchange="getData()">
+	<option value="BTC">BTC</option>
+	<option value="ETH">ETH</option>
+	<option value="XRP" selected>XRP</option>
+	<option value="XLM">XLM</option>
+</select></label>&nbsp;
+<label>Interval:
+<select id="interval" onchange="getData()">
+	<option value="1min">1 min</option>
+	<option value="5min" selected>5 min</option>
+	<option value="10min">10 min</option>
+	<option value="15min">15 min</option>
+	<option value="30min">30 min</option>
+	<option value="1hour">1 hour</option>
+</select></label>&nbsp;
+<label>Refresh:
+<select id="refresh" onchange="refreshChanged(this.value)">
+	<option value="2">2</option>
+	<option value="5" selected>5</option>
+	<option value="10">10</option>
+	<option value="30">30</option>
+</select> sec.</label>&nbsp;
+<label>Last date:
+<input id="date" type="date" onchange="getData()"/>
+</label>&nbsp;
+<label>
+<input type="radio" name="yScale" onchange="yScaleChanged(this)"
+	value="linear" />Linear</label>
+<label>
+<input type="radio" name="yScale" onchange="yScaleChanged(this)"
+	id="logScale" value="log" checked />Logarithmic</label>
+</div>
+<canvas height="480"></canvas>
+<div id="monitor"></div>
+</body>
+</html>
