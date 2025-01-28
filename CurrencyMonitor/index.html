@@ -4,14 +4,15 @@
 <meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
 <meta name="viewport" content="width=device-width"/>
 <style>
-body {font-family:Helvetica;color:#ddd;background:#333}
-#timeStamp {font-size:medium}
+body{font-family:sans-serif;color:#ddd;background:#333}
+#timeStamp{font-size:medium}
+select,input,button{font-size:medium;color:#ddd;background:#111}
 </style>
 <script type="text/javascript" src="A.js"></script>
-<title class="price">Title</title>
+<title class="price"></title>
 </head>
 <body onload="setup()">
-<h1><span class="price">Title</span> <span id="timeStamp">2025</span></h1>
+<h1><span class="price"></span> <span id="timeStamp"></span></h1>
 <div id="control">
 <label>Currency:
 <select id="symbol" onchange="getData()">
@@ -44,7 +45,8 @@ body {font-family:Helvetica;color:#ddd;background:#333}
 	value="linear" />Linear</label>
 <label>
 <input type="radio" name="yScale" onchange="yScaleChanged(this)"
-	id="logScale" value="log" checked />Logarithmic</label>
+	id="logScale" value="log" checked />Logarithmic</label>&nbsp;
+<button onclick="getData()">Reload Data</button>
 </div>
 <canvas height="480"></canvas>
 <div id="monitor"></div>

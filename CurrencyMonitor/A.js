@@ -1,14 +1,14 @@
 /*	Drawing a trend graph of Crypto Currency price in JPY
-	Data is loaded by publick API by GMO coins.
+	Data is loaded using public APIs by GMO coins Co.
 	Assumed to be used in Japan.
 	(c) Tatsuo Unemi, 2025. */
 const endPt = "https://api.coin.z.com/public/v1/";
-const XOffset = 80, YOffset = 30;
+const XOffset = 80, YOffset = 30, VolW = 0.01;
 let canvas, gctx, dateInput,
-	NPoints, LastDate, Currency, Refresh, LogScale,
-	Sequence, IntervalID, DateUpdater;
-function numFormat(x) {
-	const n = Math.max(0, Math.floor(6 - Math.log10(x)));
+	NPoints, LastDate, Currency, DataIntvl, RfrshIntvl, LogScale,
+	Sequence, IntervalID, DateUpdater, SizeUpdater;
+function numFormat(x, m) {
+	const n = (x == 0)? 0 : Math.max(0, Math.floor(m - Math.log10(Math.abs(x))));
 	return new Intl.NumberFormat("en-US",
 	{minimumFractionDigits:n, maximumFractionDigits:n, useGrouping:true})
 		.format(x);
@@ -34,10 +34,16 @@ function setup() {
 	canvas.width = document.body.clientWidth;
 	NPoints = Math.floor((canvas.width - XOffset) / 2);
 	onresize = (ev)=>{
+		if (SizeUpdater) clearTimeout(SizeUpdater);
 		canvas.width = document.body.clientWidth;
 		drawData();
+		SizeUpdater = setTimeout(()=>{
+			SizeUpdater = undefined;
+			NPoints = Math.floor((canvas.width - XOffset) / 2);
+			getData();
+		}, 1000);
 	};
-	Refresh = document.getElementById("refresh").value;
+	RfrshIntvl = document.getElementById("refresh").value * 1000;
 	LogScale = document.getElementById("logScale").checked;
 	const date = new Date();
 	if (date.getHours() < 6) date.setDate(date.getDate() - 1);
@@ -47,6 +53,22 @@ function setup() {
 	DateUpdater = setInterval(dateUpdate, date.getTime() - Date.now(), date);
 	getData();
 }
+function fetchData(com, proc) {
+	fetch(endPt + com, {mode:"no-cors"})
+	.then((r)=>{
+		if (r.ok) return r.json();
+		else throw new Error(r.statusText)}, (r)=>{throw r})
+	.then((obj)=>{
+		if (obj.status != 0) throw new Error(JSON.stringify(obj));
+		proc(obj); }).catch((x)=>{alert(x)});
+}
+function getDailyData(dtStr, proc) {
+	fetchData("klines?symbol=" + Currency
+		+ "&interval=" + DataIntvl + "&date=" + dtStr, proc);
+}
+function getTicker(proc) {
+	fetchData("ticker?symbol=" + Currency, proc);
+}
 function showTimeStamp(time) {
 	document.getElementById("timeStamp").innerText = new Date(time);
 }
@@ -54,31 +76,40 @@ function update() {
 	if (LastDate != dateInput.max) {
 		clearInterval(IntervalID);
 		IntervalID = undefined;
-	} else fetch(new Request(endPt + "ticker?symbol=" + Currency))
-		.then((r)=>r.json()).then((obj)=> {
+	} else getTicker((obj)=> {
 		if (obj.status != 0) throw new Error(JSON.stringify(obj));
-		const item = obj.data[0],
-			v = {x: new Date(item.timestamp).getTime(), y:item.last},
-			lastIdx = Sequence.length - 1;
+		const lastIdx = Sequence.length - 1, item = obj.data[0],
+			vx = new Date(item.timestamp).getTime(), vy = item.last,
+			revLast = ()=>{
+				Sequence[lastIdx].x = vx;
+				if (vy != Sequence[lastIdx].y) {
+					Sequence[lastIdx].y = vy;
+					drawData();
+				} else showTimeStamp(vx);
+			};
 		if (Sequence[lastIdx].x - Sequence[lastIdx - 1].x
-			< Sequence[1].x - Sequence[0].x) {
-			if (v.y != Sequence[lastIdx].y) {
-				Sequence.splice(lastIdx, 1, v);
-				drawData();
-			} else showTimeStamp(Sequence[lastIdx].x = v.x);
-		} else {
-			Sequence.splice(0, 1);
-			Sequence.push(v);
-			drawData();
-		}
+			>= Sequence[1].x - Sequence[0].x + 60000) {
+			const dtArr = LastDate.split("-");
+			getDailyData(`${dtArr[0]}${dtArr[1]}${dtArr[2]}`, (obj)=>{
+				const data = obj.data, item = data[data.length - 1],
+					opntm = Number.parseFloat(item.openTime);
+				if (opntm > Sequence[lastIdx - 1].x) {
+					Sequence.splice(lastIdx, 1, {x:opntm, y:item.open, v:
+							Sequence[lastIdx - 1].v * (1.0 - VolW) + item.volume * VolW},
+						{x:vx, y:vy});
+					Sequence.splice(0, 1);
+					drawData();
+				} else revLast();
+			});
+		} else revLast();
 	});
 }
 function refreshChanged(newRate) {
-	if (newRate == Refresh) return;
-	Refresh = newRate;
+	if ((newRate *= 1000) == RfrshIntvl) return;
+	RfrshIntvl = newRate;
 	if (IntervalID) {
 		clearInterval(IntervalID);
-		IntervalID = setInterval(update, Refresh * 1000);
+		IntervalID = setInterval(update, RfrshIntvl);
 	}
 }
 function yScaleChanged(btn) {
@@ -91,7 +122,9 @@ function drawData() {
 	let min=1e10, max=-1e10, vmin = 1e10, vmax = -1e10;
 	for (const v of Sequence) {
 		if (min > v.y) min = v.y; if (max < v.y) max = v.y;
-		if (v.v) { if (vmin > v.v) vmin = v.v; if (vmax < v.v) vmax = v.v; }
+		if (v.v) {
+			if (vmin > v.v && v.v > 0) vmin = v.v;
+			if (vmax < v.v) vmax = v.v; }
 	}
 	const P = LogScale?
 		(v, mx, mi)=>(Math.log(mx) - Math.log(v)) / (Math.log(mx) - Math.log(mi)) * h :
@@ -118,13 +151,13 @@ function drawData() {
 	gctx.textBaseline = "top";
 	const tmStart = Sequence[0].x, tmEnd = Sequence[len - 1].x;
 	const prcs = document.getElementsByClassName("price"),
-		prcStr = numFormat(Sequence[len - 1].y);
+		prcStr = numFormat(Sequence[len - 1].y, 6);
 	for (let i = 0; i < prcs.length; i ++)
 		prcs[i].innerText = prcStr;
 	showTimeStamp(tmEnd);
 	document.getElementById("monitor").innerText =
-		 `min=${min}, max=${max}, max/min=${numFormat(max/min)}`
-		 + `, vmax=${Math.round(vmax)}, vmin=${Math.round(vmin)}`;
+		 `min=${min}, max=${max}, max/min=${numFormat(max/min, 5)}`
+		 + `, vmax=${numFormat(vmax, 6)}, vmin=${numFormat(vmin, 6)}`;
 	const dt = new Date(tmStart);
 	sp = (tmEnd - tmStart) / 7;
 	if (sp > 24*3600*1000) {
@@ -142,15 +175,13 @@ function drawData() {
 		while (24 % inc > 0 && inc > 1) inc --;
 		dt.setHours((Math.floor(dt.getHours() / inc) + 1) * inc, 0,0,0);
 		gctx.textAlign = "center";
-		let d = dt.getDate();
 		for (let t = 0; (t = dt.getTime()) < tmEnd;
 			dt.setHours(dt.getHours() + inc)) {
 			const x = (t - tmStart) / (tmEnd - tmStart) * w + XOffset;
 			gctx.moveTo(x, 0); gctx.lineTo(x, h);
-			let s = "";
-			if (d != dt.getDate())
-				{ d = dt.getDate(); s = `${dt.getMonth()+1}/${d} `; }
-			gctx.fillText(`${s}${dt.getHours()}:00`, x, h + 5);
+			const hr = dt.getHours(),
+				s = (hr == 0)? `${dt.getMonth()+1}/${dt.getDate()} ` : "";
+			gctx.fillText(`${s}${hr}:00`, x, h + 5);
 		}
 	}
 	gctx.strokeStyle = "#08f";
@@ -175,36 +206,38 @@ function drawData() {
 	gctx.stroke();
 }
 function getData() {
-	const urlStr = endPt + "klines"
-		+ "?symbol=" + (Currency = document.getElementById("symbol").value)
-		+ "&interval=" + document.getElementById("interval").value
-		+ "&date=", dat = new Date(LastDate = dateInput.value);
-	try {
-		const fetchData = (seq, resTm, cnt) => {
-			if (seq.length < NPoints && cnt <= 32) {
-				fetch(new Request(urlStr + dateStr(dat))).then((r)=>r.json())
-				.then((obj)=> {
-					if (obj.status != 0) throw new Error(JSON.stringify(obj));
-					dat.setDate(dat.getDate() - 1);
-					fetchData(Array.from(obj.data).concat(seq),
-						(resTm == 0)? new Date(obj.responsetime).getTime() : resTm,
-						cnt + 1);
+	Currency = document.getElementById("symbol").value;
+	DataIntvl = document.getElementById("interval").value;
+	const dat = new Date(LastDate = dateInput.value);
+	const fetchData = (seq, cnt) => {
+		if (seq.length < NPoints && cnt < 30) {
+			getDailyData(dateStr(dat), (obj)=> {
+				dat.setDate(dat.getDate() - 1);
+				fetchData(Array.from(obj.data).concat(seq), cnt + 1);
+			});
+		} else if (seq.length >= NPoints) {
+			seq.splice(0, seq.length - NPoints);
+			Sequence = seq.map((x)=>
+				{ return {x:Number.parseFloat(x.openTime), y:x.open} });
+			let v = 0, n = 0;
+			for (let i = 0; i < 10 && i < seq.length; i ++, n ++)
+				v += Number.parseFloat(seq[i].volume);
+			Sequence[0].v = v /= n;
+			for (let i = 1; i < seq.length; i ++)
+				Sequence[i].v = (v += (Number.parseFloat(seq[i].volume) - v) * VolW);
+			if (LastDate == dateInput.max) {
+				getTicker((obj)=>{
+					const item = obj.data[0];
+					Sequence.push({x:new Date(item.timestamp).getTime(), y:item.last});
+					drawData();
+					if (!IntervalID) IntervalID = setInterval(update, RfrshIntvl);
 				});
-			} else if (seq.length >= NPoints) {
-				seq.splice(0, seq.length - NPoints);
-				Sequence = seq.map((x)=>{ return {x:new Number(x.openTime), y:x.open} });
-				let v = new Number(seq[0].volume);
-				Sequence[0].v = v;
-				for (let i = 1; i < seq.length; i ++)
-					Sequence[i].v = (v += (new Number(seq[i].volume) - v) * 0.1);
-				Sequence.push({x:resTm, y:seq[seq.length-1].close});
+			} else {
+				Sequence.push({x:Sequence[Sequence.length - 1].x * 2
+					- Sequence[Sequence.length - 2].x, y:seq[seq.length - 1].close});
 				drawData();
-				if (LastDate == dateInput.max) {
-					if (!IntervalID) IntervalID = setInterval(update, Refresh * 1000);
-				} else if (IntervalID) {
-					clearInterval(IntervalID); IntervalID = undefined;
-				}
-			} };
-		fetchData([], 0, 0);
-	} catch (err) { alert(err.toString()) }
+				if (IntervalID) { clearInterval(IntervalID); IntervalID = undefined; }
+			}
+		} };
+	fetchData([], 0);
 }
