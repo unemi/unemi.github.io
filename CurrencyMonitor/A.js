@@ -57,9 +57,10 @@ function fetchData(com, proc) {
 	fetch(endPt + com, {mode:"no-cors"})
 	.then((r)=>{
 		if (r.ok) return r.json();
-		else throw new Error(r.statusText)}, (r)=>{throw r})
+		else throw "Not OK. " + r.statusText; },
+		(r)=>{throw "Rejected. " + r})
 	.then((obj)=>{
-		if (obj.status != 0) throw new Error(JSON.stringify(obj));
+		if (obj.status != 0) throw JSON.stringify(obj);
 		proc(obj); }).catch((x)=>{alert(x)});
 }
 function getDailyData(dtStr, proc) {
