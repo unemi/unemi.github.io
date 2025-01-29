@@ -64,8 +64,7 @@ function setup() {
 	getData();
 }
 function fetchData(com, proc) {
-	fetch(endPt + com, {mode:"no-cors"})
-	.then((r)=>{
+	fetch(endPt + com).then((r)=>{
 		if (r.ok) return r.json();
 		else throw new Error("Not OK. " + r.statusText); },
 		(r)=>{ throw new Error("Rejected. " + r); })
