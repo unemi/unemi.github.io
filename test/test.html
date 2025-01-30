@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style type="text/css">
+body {color:#e0e0e0; background:#404040; font-family:sans-serif}
+.blink {animation:2s steps(1, end) 0s infinite normal blinking}
+@keyframes blinking {
+	from { color:red; background:yellow }
+	50% { color:blue; background:cyan }
+}
+</style>
+<script type="text/javascript">
+const myWorker = new Worker("test.js")
+myWorker.addEventListener("message", (msg)=>{
+  console.log("M:",msg);});
+</script>
+<title>お試しページ</title>
+</head>
+<body onload="myWorker.postMessage('Message from main.')">
+<h1>お試しページ</h1>
+<h2>はじめに</h2>
+<div class="blink">これはお試しページである。</div>
+<h2>質問</h2>
+<form action="" method="GET">
+名前を教えてください。
+<input type="text" placeholder="本名をいれてください"></input><br/>
+生年月日 <input type="date" name="birthDate" value="2001-09-11"></input><br/>
+起床時刻 <input type="time" value="03:48"></input><br/>
+得意技: <input type="checkbox" checked></input>夜更かし
+<input type="checkbox"></input>水泳
+<input type="checkbox"></input>マラソン<br/>
+性別: <input type="radio" name="sex" value="male"></input>男性
+<input type="radio" name="sex" value="female" checked></input>女性
+<input type="radio" name="sex" value="other"></input>その他<br/>
+好きな色 <input type="color" value="#0066FF"></input><br/>
+レポート・アップロード
+<input type="file" accept="application/ms-word,.pdf"></input><br/>
+<input type="submit" value="入力終わりました。"></input>
+</form>
+<h2>おわりに</h2>
+以上である。
+</body>
+</html>
